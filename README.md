@@ -3,6 +3,7 @@
 This repository provides a lightweight, fully reproducible machine learning pipeline for predicting magnetic ordering in two-dimensional (2D) materials using only chemical composition as input. The project integrates PAW-based DFT data (V2DB) with a Gradient Boosting classifier and performs high-throughput screening to identify novel magnetic candidates.
 
 > Note: The first version of this project used data from the Computational 2D Materials Database (C2DB). However, C2DB has a strict CC-BY-NC-SA license. Because of this, I removed all C2DB datasets, related scripts, and hybrid weighting functions from this repository. This is the license-free version of the project. You just need to bring your own V2DB-style data to run the codes.
+> Note: This project utilizes data from the [Virtual 2D Materials Database (V2DB)](https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/SNCZF4), which is curated under the CC BY 4.0 license.
 
 ---
 
