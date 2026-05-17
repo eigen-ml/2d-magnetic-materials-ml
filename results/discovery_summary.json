@@ -1,0 +1,50 @@
+{
+  "total_generated": 2528,
+  "known_filtered": 492,
+  "novel_screened": 2036,
+  "magnetic_predicted": 1472,
+  "very_high_confidence": 377,
+  "high_confidence": 195,
+  "top_10": [
+    {
+      "formula": "Mn2CrBr4",
+      "probability": 0.9992765165699993
+    },
+    {
+      "formula": "Mn2CrCl4",
+      "probability": 0.9992293373626762
+    },
+    {
+      "formula": "Mn2CrI4",
+      "probability": 0.9991423576493729
+    },
+    {
+      "formula": "Mn2CrF4",
+      "probability": 0.999083839919833
+    },
+    {
+      "formula": "Mn2FeO4",
+      "probability": 0.9990130118075068
+    },
+    {
+      "formula": "Mn2CrO4",
+      "probability": 0.9989801421832577
+    },
+    {
+      "formula": "Mn2FeCl4",
+      "probability": 0.9988439860318101
+    },
+    {
+      "formula": "Mn2FeI4",
+      "probability": 0.9987690085185135
+    },
+    {
+      "formula": "Mn2CoCl4",
+      "probability": 0.9987355884280952
+    },
+    {
+      "formula": "Fe2CoCl4",
+      "probability": 0.9987055367796782
+    }
+  ]
+}
