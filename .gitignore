@@ -1,0 +1,45 @@
+# Python bytecode and test caches
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Virtual environments and local configuration
+.venv/
+venv/
+env/
+.env
+.env.*
+!.env.example
+
+# Packaging and notebooks
+build/
+dist/
+*.egg-info/
+.ipynb_checkpoints/
+
+# Editors and operating systems
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+*Zone.Identifier
+
+# HPC and profiling output
+slurm-*.out
+*.prof
+
+# Reproducible pipeline outputs. Historical files already tracked by Git are
+# unaffected by these rules; newly generated artefacts stay local by default.
+/data/combined_dataset.csv
+/data/known_materials.txt
+/models/*.joblib
+/models/*.npy
+/models/*.csv
+/models/*.json
+/results/*
+!/results/.gitkeep
+/figures/fig*.png

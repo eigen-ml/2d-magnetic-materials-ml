@@ -1,0 +1,49 @@
+# Dataset and artefact notes
+
+This file separates original project code from third-party data and records what was verifiable in the repository snapshot audited on 2026-08-14.
+
+## License scope
+
+`LICENSE` applies to original code and documentation authored for this repository. It does not change or replace the terms of upstream datasets. Before redistributing data or derived artefacts, confirm the applicable terms at the source record and retain required attribution.
+
+## `data/v2db.csv`
+
+- Local shape: 316,505 rows and 16 columns.
+- SHA-256: `0e47ec794857533585652ca6e60f65871170dc95bb51a41c9ea47fe205f6abd7`.
+- The schema includes formula, prototype, predicted energy/electronic properties, `Magnetic_state`, and `Material_is_magnetic`.
+- The row count and schema agree with the published V2DB description, but the exact download URL, source version, and upstream checksum were not committed. Therefore, this audit could not prove byte-for-byte identity with the current Harvard Dataverse file.
+- Upstream dataset: M. C. Sorkun, S. Astruc, J. M. V. A. Koelman, and S. Er (2020), *V2DB: Virtual 2D Materials Database*, Harvard Dataverse, [doi:10.7910/DVN/SNCZF4](https://doi.org/10.7910/DVN/SNCZF4).
+- The upstream project describes V2DB as CC BY 4.0. Because the exact local snapshot provenance and checksum were not recorded, confirm the current record and file-level terms before redistributing this CSV.
+- Associated method paper: [doi:10.1038/s41524-020-00375-7](https://doi.org/10.1038/s41524-020-00375-7).
+- Consult the dataset landing page for its current file-level reuse terms. Do not infer that the repository's MIT license covers this CSV.
+
+V2DB entries and magnetic labels are outputs of the upstream AI-aided screening workflow. They are not new PAW/DFT calculations performed by this repository.
+
+## Checked-in hybrid derived artefacts
+
+The following files came from an older C2DB+V2DB workflow even though the previous README described the repository as V2DB-only:
+
+- `data/combined_dataset.csv`: 141,171 unique reduced formulas; 13,251 rows marked C2DB and 127,920 marked V2DB. SHA-256 `33aa1b25bfd4c76a9f84752307d9d07ec8b8d29dec77fbe0794d1124ab764fad`.
+- `data/known_materials.txt`: the same 141,171 formulas. SHA-256 `48049e25db533e498a7313b6222b5dcdce80b84db535a98e7df227cfebad1762`.
+- `models/model.joblib`, `models/metadata.json`, `models/threshold.npy`, and `models/feature_importance.csv`: hybrid-model artefacts. The metadata names model version `v2.0_hybrid` and records a C2DB source weight of 6.0.
+- `results/novel_candidates.csv`, `results/dft_candidates.csv`, and `results/discovery_summary.json`: outputs from that hybrid model. “Novel” meant absent from the local formula reference only.
+- `figures/fig1_dataset_overview.png` through `figures/fig5_pipeline_summary.png` and `results/thesis_tables.xlsx`: legacy presentation artefacts containing the same hybrid counts and metrics.
+
+The exact source package/version and license notice for the extracted C2DB subset were not stored in this Git history. The current Computational Materials Repository states that its databases use CC BY-SA 4.0, but this audit cannot determine which terms accompanied the older local extraction. Review the source and its historical terms before redistribution. The repository's MIT license does not override them.
+
+The archived `model.joblib` was not deserialized during this audit because joblib uses pickle and loading an untrusted pickle can execute code. Its SHA-256 is `ab46708fe870bdb1a99ed8ee458002b58dfb751bdf7a50fd69cb6b2b182b1e35`.
+
+## Regenerating current artefacts
+
+Running the current pipeline replaces the default generated data/model files and creates screening outputs with scientifically narrower names:
+
+```bash
+python scripts/02_prepare_data.py
+python scripts/03_train_model.py
+python scripts/04_discover.py
+python figures/05_visualize.py
+```
+
+The current preparation step removes reduced formulas whose V2DB prototype rows disagree on the magnetic label. The current training metadata records an input checksum, feature schema, dependency versions, data split, threshold selection, and untouched-test metrics. The current screening output uses “unseen” to mean absent from the supplied reference set and explicitly does not claim global novelty or DFT readiness.
+
+The preparation step was executed during the audit against the checked-in V2DB file using temporary outputs. It read 316,505 rows, rejected zero invalid formulas, removed 2,231 reduced formulas with conflicting labels across prototypes, and retained 127,024 consensus compositions, including 9,772 magnetic labels (7.7%).
