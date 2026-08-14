@@ -1,253 +1,326 @@
 #!/usr/bin/env python3
-"""
-04_discover.py
-Novelty filter ile yeni manyetik 2D malzeme kesfi.
-"""
+"""Score enumerated compositions that are absent from a reference formula set."""
 
-import joblib
-import pandas as pd
-import numpy as np
+from __future__ import annotations
+
+import argparse
 import json
-from pymatgen.core import Composition
+import sys
 from itertools import combinations, product
 from pathlib import Path
+from typing import Any, Iterable, Sequence
 
-# Paths
-DATA_DIR = Path("data")
-MODEL_DIR = Path("models")
-RESULTS_DIR = Path("results")
-RESULTS_DIR.mkdir(exist_ok=True)
+import joblib
+import numpy as np
+import pandas as pd
+from pymatgen.core import Composition
 
-def load_known_materials() -> set:
-    """Bilinen malzemeleri yukle"""
-    known = set()
-    with open(DATA_DIR / "known_materials.txt", "r") as f:
-        for line in f:
-            known.add(line.strip())
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+DEFAULT_KNOWN = REPO_ROOT / "data" / "known_materials.txt"
+DEFAULT_MODEL_DIR = REPO_ROOT / "models"
+DEFAULT_RESULTS_DIR = REPO_ROOT / "results"
+
+MAGNETIC_METALS = ("Mn", "Cr", "Fe", "Co", "Ni", "V", "Cu", "Ti")
+ANIONS = ("S", "Se", "Te", "O", "Cl", "Br", "I", "F")
+OTHER_METALS = ("Zr", "Hf", "Nb", "Ta", "Mo", "W", "Ru", "Pd", "Pt")
+
+
+class ScreeningError(RuntimeError):
+    """Raised when screening inputs or model artefacts are unusable."""
+
+
+def load_known_materials(path: str | Path) -> set[str]:
+    """Load the reduced-formula reference set."""
+    source = Path(path)
+    if not source.is_file():
+        raise FileNotFoundError(
+            f"known-material reference not found: {source}. "
+            "Run scripts/02_prepare_data.py first or pass --known-materials."
+        )
+    known: set[str] = set()
+    for line_number, line in enumerate(
+        source.read_text(encoding="utf-8").splitlines(), start=1
+    ):
+        if not line.strip():
+            continue
+        reduced = normalize_formula(line.strip())
+        if reduced is None:
+            raise ScreeningError(
+                f"{source}: line {line_number} is not a valid chemical formula"
+            )
+        known.add(reduced)
+    if not known:
+        raise ScreeningError(f"known-material reference is empty: {source}")
     return known
 
-def load_model():
-    """Model ve metadata yukle"""
-    clf = joblib.load(MODEL_DIR / "model.joblib")
-    threshold = np.load(MODEL_DIR / "threshold.npy")
-    
-    with open(MODEL_DIR / "metadata.json", "r") as f:
-        metadata = json.load(f)
-    
-    return clf, float(threshold), metadata
 
-def generate_candidates(magnetic_metals, anions, other_metals=None) -> list:
-    """Sistematik aday uret"""
-    candidates = set()
-    
-    # Binary: MX, MX2, MX3
-    for m, x in product(magnetic_metals, anions):
-        candidates.add(f"{m}{x}")
-        candidates.add(f"{m}{x}2")
-        candidates.add(f"{m}{x}3")
-        candidates.add(f"{m}2{x}3")
-    
-    # Ternary: M1M2X3, M1M2X4
-    for (m1, m2), x in product(combinations(magnetic_metals, 2), anions):
-        candidates.add(f"{m1}{m2}{x}3")
-        candidates.add(f"{m1}{m2}{x}4")
-        candidates.add(f"{m1}2{m2}{x}4")
-    
-    # Mixed metal: MM'X3
-    if other_metals:
-        for m, m2, x in product(magnetic_metals, other_metals, anions):
-            candidates.add(f"{m}{m2}{x}3")
-            candidates.add(f"{m}{m2}2{x}4")
-    
-    # Mixed anion: MX2Y
-    for m, (x, y) in product(magnetic_metals, combinations(anions, 2)):
-        candidates.add(f"{m}{x}2{y}")
-        candidates.add(f"{m}{x}{y}2")
-    
-    return list(candidates)
-
-def normalize_formula(formula: str) -> str | None:
-    """Formulu normalize et"""
-    try:
-        return Composition(formula).reduced_formula
-    except:
-        return None
-
-def featurize(formula: str, feature_names: list) -> dict | None:
-    """Tek formulu featurize et"""
-    try:
-        comp = Composition(formula)
-        frac = comp.get_el_amt_dict()
-        total = sum(frac.values())
-        
-        feats = {f"elem_{k}": v/total for k, v in frac.items()}
-        feats["natoms"] = comp.num_atoms
-        
-        # Template'e uyumlu hale getir
-        return {col: feats.get(col, 0) for col in feature_names}
-    except:
-        return None
-
-def main():
-    print("=" * 60)
-    print("* NOVEL MAGNETIC MATERIALS DISCOVERY")
-    print("=" * 60)
-    
-    # 1. Model yukle
-    print("\nModel yukleniyor...")
-    clf, threshold, metadata = load_model()
-    feature_names = metadata["feature_names"]
-    print(f"  > Threshold: {threshold:.4f}")
-    print(f"  > Features: {len(feature_names)}")
-    
-    # 2. Known materials yukle
-    print("\nBilinen malzemeler yukleniyor...")
-    known_materials = load_known_materials()
-    print(f"  > {len(known_materials):,} bilinen formul")
-    
-    # 3. Adaylar uret
-    print("\nAdaylar uretiliyor...")
-    MAGNETIC_METALS = ["Mn", "Cr", "Fe", "Co", "Ni", "V", "Cu", "Ti"]
-    ANIONS = ["S", "Se", "Te", "O", "Cl", "Br", "I", "F"]
-    OTHER_METALS = ["Zr", "Hf", "Nb", "Ta", "Mo", "W", "Ru", "Pd", "Pt"]
-    
-    raw_candidates = generate_candidates(MAGNETIC_METALS, ANIONS, OTHER_METALS)
-    print(f"  > {len(raw_candidates):,} ham aday")
-    
-    # 4. Normalize ve novelty filter
-    print("\nNovelty filter uygulaniyor...")
-    novel_candidates = []
-    known_count = 0
-    invalid_count = 0
-    
-    for formula in raw_candidates:
-        normalized = normalize_formula(formula)
-        if normalized is None:
-            invalid_count += 1
-            continue
-        
-        if normalized in known_materials:
-            known_count += 1
-            continue
-        
-        novel_candidates.append(normalized)
-    
-    # Duplicate'leri kaldir
-    novel_candidates = list(set(novel_candidates))
-    
-    print(f"  > {known_count:,} zaten biliniyor (atlandi)")
-    print(f"  > {invalid_count:,} gecersiz formul")
-    print(f"  > {len(novel_candidates):,} NOVEL aday")
-    
-    # 5. Featurize
-    print("\n* Featurization...")
-    X_list = []
-    valid_formulas = []
-    
-    for formula in novel_candidates:
-        feats = featurize(formula, feature_names)
-        if feats:
-            X_list.append(feats)
-            valid_formulas.append(formula)
-    
-    X = pd.DataFrame(X_list)
-    print(f"  > {len(X):,} featurize edildi")
-    
-    # 6. Prediction
-    print("\nTahminler yapiliyor...")
-    probs = clf.predict_proba(X)[:, 1]
-    
-    results = []
-    for formula, prob in zip(valid_formulas, probs):
-        if prob >= threshold:
-            if prob >= 0.95:
-                conf = "Very High"
-            elif prob >= 0.90:
-                conf = "High"
-            elif prob >= 0.80:
-                conf = "Medium"
-            else:
-                conf = "Low"
-            
-            results.append({
-                "formula": formula,
-                "probability": prob,
-                "confidence": conf
-            })
-    
-    df_results = pd.DataFrame(results).sort_values("probability", ascending=False)
-    
-    print(f"\n    {len(df_results):,} NOVEL manyetik aday bulundu!")
-    
-    # 7. Istatistikler
-    print("\n" + "=" * 60)
-    print("DISCOVERY ISTATISTIKLERI")
-    print("=" * 60)
-    print(f"  Taranan novel aday:  {len(valid_formulas):,}")
-    print(f"  Manyetik tahmin:     {len(df_results):,} ({len(df_results)/len(valid_formulas)*100:.1f}%)")
-    print(f"\n  Confidence dagilimi:")
-    for conf in ["Very High", "High", "Medium", "Low"]:
-        count = len(df_results[df_results["confidence"] == conf])
-        print(f"     {conf:10s}: {count:,}")
-    
-    # 8. Top 20
-    print("\nTOP 20 NOVEL MANYETIK ADAYLAR:")
-    print("-" * 50)
-    
-    for i, row in df_results.head(20).iterrows():
-        rank = list(df_results.head(20).index).index(i) + 1
-        bar = "#" * int(row["probability"] * 30)
-        print(f"{rank:2d}. {row['formula']:15s} {bar} {row['probability']:.4f} [{row['confidence']}]")
-    
-    # 9. Element analizi
-    print("\n* TOP 20'DEKI ELEMENT DAGILIMI:")
-    elem_counts = {}
-    for formula in df_results.head(20)["formula"]:
-        try:
-            comp = Composition(formula)
-            for el in comp.elements:
-                elem_counts[el.symbol] = elem_counts.get(el.symbol, 0) + 1
-        except:
-            pass
-    
-    for elem, count in sorted(elem_counts.items(), key=lambda x: -x[1])[:10]:
-        marker = "[M]" if elem in MAGNETIC_METALS else "   "
-        print(f"  {marker} {elem:3s}: {'#' * count} {count}")
-    
-    # 10. Kaydet
-    print("\nSonuclar kaydediliyor...")
-    
-    df_results.to_csv(RESULTS_DIR / "novel_candidates.csv", index=False)
-    
-    # DFT-ready format
-    df_dft = df_results.head(50).copy()
-    df_dft["priority"] = range(1, len(df_dft) + 1)
-    df_dft["suggested_method"] = "PBE+U"
-    df_dft["notes"] = "Novel - not in V2DB"
-    df_dft.to_csv(RESULTS_DIR / "dft_candidates.csv", index=False)
-    
-    # Summary
-    summary = {
-        "total_generated": len(raw_candidates),
-        "known_filtered": known_count,
-        "novel_screened": len(valid_formulas),
-        "magnetic_predicted": len(df_results),
-        "very_high_confidence": len(df_results[df_results["confidence"] == "Very High"]),
-        "high_confidence": len(df_results[df_results["confidence"] == "High"]),
-        "top_10": df_results.head(10)[["formula", "probability"]].to_dict("records")
+def load_model(model_dir: str | Path) -> tuple[Any, float, dict[str, Any]]:
+    """Load trusted local model artefacts and validate their basic metadata."""
+    directory = Path(model_dir)
+    required = {
+        "model": directory / "model.joblib",
+        "threshold": directory / "threshold.npy",
+        "metadata": directory / "metadata.json",
     }
-    
-    with open(RESULTS_DIR / "discovery_summary.json", "w") as f:
-        json.dump(summary, f, indent=2)
-    
-    print(f"  > {RESULTS_DIR}/novel_candidates.csv")
-    print(f"  > {RESULTS_DIR}/dft_candidates.csv")
-    print(f"  > {RESULTS_DIR}/discovery_summary.json")
-    
-    print("\n" + "=" * 60)
-    print("DISCOVERY TAMAMLANDI!")
-    print("=" * 60)
-    print(f"\n{len(df_results[df_results['confidence'].isin(['Very High', 'High'])])} yuksek guvenilirlikli NOVEL aday DFT'ye hazir!")
+    missing = [str(path) for path in required.values() if not path.is_file()]
+    if missing:
+        raise FileNotFoundError(
+            "missing model artefact(s): " + ", ".join(missing) + ". Run training first."
+        )
+
+    try:
+        metadata = json.loads(required["metadata"].read_text(encoding="utf-8"))
+        threshold = float(np.load(required["threshold"], allow_pickle=False))
+        # joblib uses pickle internally. Only load artefacts produced locally or
+        # obtained from a trusted source.
+        classifier = joblib.load(required["model"])
+    except Exception as exc:  # Convert version/pickle failures into a useful CLI error.
+        raise ScreeningError(
+            "model artefacts could not be loaded; verify that they are trusted and "
+            "were created with compatible dependency versions"
+        ) from exc
+
+    feature_names = metadata.get("feature_names")
+    if not isinstance(feature_names, list) or not feature_names:
+        raise ScreeningError("metadata.json does not contain a non-empty feature_names list")
+    if not 0.0 <= threshold <= 1.0:
+        raise ScreeningError(f"invalid decision threshold: {threshold}")
+    return classifier, threshold, metadata
+
+
+def generate_candidates(
+    magnetic_metals: Sequence[str],
+    anions: Sequence[str],
+    other_metals: Sequence[str] | None = None,
+) -> list[str]:
+    """Enumerate the project's rule-based composition search space deterministically."""
+    candidates: set[str] = set()
+
+    for metal, anion in product(magnetic_metals, anions):
+        candidates.update(
+            {
+                f"{metal}{anion}",
+                f"{metal}{anion}2",
+                f"{metal}{anion}3",
+                f"{metal}2{anion}3",
+            }
+        )
+
+    for (first_metal, second_metal), anion in product(
+        combinations(magnetic_metals, 2), anions
+    ):
+        candidates.update(
+            {
+                f"{first_metal}{second_metal}{anion}3",
+                f"{first_metal}{second_metal}{anion}4",
+                f"{first_metal}2{second_metal}{anion}4",
+            }
+        )
+
+    if other_metals:
+        for metal, other_metal, anion in product(
+            magnetic_metals, other_metals, anions
+        ):
+            candidates.update(
+                {
+                    f"{metal}{other_metal}{anion}3",
+                    f"{metal}{other_metal}2{anion}4",
+                }
+            )
+
+    for metal, (first_anion, second_anion) in product(
+        magnetic_metals, combinations(anions, 2)
+    ):
+        candidates.update(
+            {
+                f"{metal}{first_anion}2{second_anion}",
+                f"{metal}{first_anion}{second_anion}2",
+            }
+        )
+    return sorted(candidates)
+
+
+def normalize_formula(formula: object) -> str | None:
+    """Return a reduced chemical formula, or ``None`` when parsing fails."""
+    try:
+        return Composition(str(formula)).reduced_formula
+    except (TypeError, ValueError):
+        return None
+
+
+def featurize(formula: str, feature_names: Sequence[str]) -> dict[str, float] | None:
+    """Map one composition onto the exact feature schema used during training."""
+    try:
+        composition = Composition(formula)
+    except (TypeError, ValueError):
+        return None
+
+    amounts = composition.get_el_amt_dict()
+    total = float(sum(amounts.values()))
+    if total <= 0:
+        return None
+    available_element_features = {f"elem_{element}" for element in amounts}
+    if not available_element_features.issubset(feature_names):
+        return None
+    available = {
+        **{f"elem_{element}": float(amount / total) for element, amount in amounts.items()},
+        "natoms": float(composition.num_atoms),
+    }
+    return {feature: available.get(feature, 0.0) for feature in feature_names}
+
+
+def score_band(score: float) -> str:
+    """Return a descriptive score band; this is not calibrated confidence."""
+    if score >= 0.95:
+        return "0.95-1.00"
+    if score >= 0.90:
+        return "0.90-0.95"
+    if score >= 0.80:
+        return "0.80-0.90"
+    return "threshold-0.80"
+
+
+def positive_class_index(classifier: Any) -> int:
+    """Locate the positive class in a scikit-learn compatible classifier."""
+    classes = list(getattr(classifier, "classes_", []))
+    if 1 not in classes:
+        raise ScreeningError("the loaded classifier does not expose binary class 1")
+    return classes.index(1)
+
+
+def normalize_candidates(candidates: Iterable[str]) -> tuple[list[str], int]:
+    """Normalize and deduplicate candidates, returning invalid-input count."""
+    normalized: set[str] = set()
+    invalid = 0
+    for formula in candidates:
+        reduced = normalize_formula(formula)
+        if reduced is None:
+            invalid += 1
+        else:
+            normalized.add(reduced)
+    return sorted(normalized), invalid
+
+
+def build_parser() -> argparse.ArgumentParser:
+    """Build the command-line interface."""
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--known-materials", type=Path, default=DEFAULT_KNOWN)
+    parser.add_argument("--model-dir", type=Path, default=DEFAULT_MODEL_DIR)
+    parser.add_argument("--results-dir", type=Path, default=DEFAULT_RESULTS_DIR)
+    parser.add_argument("--shortlist-size", type=int, default=50)
+    return parser
+
+
+def main(argv: list[str] | None = None) -> int:
+    """Run composition screening and return a process exit code."""
+    args = build_parser().parse_args(argv)
+    if args.shortlist_size < 1:
+        print("ERROR: --shortlist-size must be at least 1", file=sys.stderr)
+        return 2
+
+    try:
+        classifier, threshold, metadata = load_model(args.model_dir)
+        known_materials = load_known_materials(args.known_materials)
+        generated = generate_candidates(MAGNETIC_METALS, ANIONS, OTHER_METALS)
+        normalized, invalid_count = normalize_candidates(generated)
+        reference_matches = set(normalized).intersection(known_materials)
+        unseen = sorted(set(normalized).difference(known_materials))
+        if not unseen:
+            raise ScreeningError("no compositions remain after reference-set exclusion")
+
+        feature_names = metadata["feature_names"]
+        feature_rows: list[dict[str, float]] = []
+        valid_formulas: list[str] = []
+        for formula in unseen:
+            features = featurize(formula, feature_names)
+            if features is not None:
+                feature_rows.append(features)
+                valid_formulas.append(formula)
+        if not feature_rows:
+            raise ScreeningError("none of the unseen formulas could be featurized")
+
+        X = pd.DataFrame(feature_rows, columns=feature_names)
+        class_index = positive_class_index(classifier)
+        scores = np.asarray(classifier.predict_proba(X))[:, class_index]
+        selected = [
+            {
+                "formula": formula,
+                "magnetic_score": float(score),
+                "score_band": score_band(float(score)),
+            }
+            for formula, score in zip(valid_formulas, scores)
+            if score >= threshold
+        ]
+        results = pd.DataFrame(
+            selected, columns=["formula", "magnetic_score", "score_band"]
+        ).sort_values(
+            ["magnetic_score", "formula"], ascending=[False, True], ignore_index=True
+        )
+    except (
+        FileNotFoundError,
+        OSError,
+        ValueError,
+        KeyError,
+        json.JSONDecodeError,
+        ScreeningError,
+    ) as exc:
+        print(f"ERROR: {exc}", file=sys.stderr)
+        return 2
+
+    args.results_dir.mkdir(parents=True, exist_ok=True)
+    results_path = args.results_dir / "screened_candidates.csv"
+    shortlist_path = args.results_dir / "candidate_shortlist.csv"
+    summary_path = args.results_dir / "screening_summary.json"
+    results.to_csv(results_path, index=False)
+
+    shortlist = results.head(args.shortlist_size).copy()
+    shortlist.insert(0, "rank", range(1, len(shortlist) + 1))
+    shortlist["validation_status"] = (
+        "composition proposal; structure and stability not evaluated"
+    )
+    shortlist.to_csv(shortlist_path, index=False)
+
+    band_counts = {
+        band: int(count)
+        for band, count in results["score_band"].value_counts().sort_index().items()
+    }
+    summary = {
+        "model_version": metadata.get("model_version", "unknown"),
+        "decision_threshold": threshold,
+        "scores_calibrated": bool(
+            metadata.get("scientific_scope", {}).get("scores_calibrated", False)
+        ),
+        "generated_formula_strings": len(generated),
+        "unique_reduced_compositions": len(normalized),
+        "invalid_generated_formulas": invalid_count,
+        "reference_set_size": len(known_materials),
+        "reference_matches_excluded": len(reference_matches),
+        "unsupported_compositions_skipped": len(unseen) - len(valid_formulas),
+        "unseen_compositions_scored": len(valid_formulas),
+        "selected_at_threshold": len(results),
+        "score_band_counts": band_counts,
+        "interpretation": (
+            "Selected rows are composition proposals absent from the supplied "
+            "reference set, not validated materials or globally novel compounds."
+        ),
+    }
+    summary_path.write_text(
+        json.dumps(summary, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    )
+
+    print(f"Generated formula strings: {len(generated):,}")
+    print(f"Unique reduced compositions: {len(normalized):,}")
+    print(f"Reference matches excluded: {len(reference_matches):,}")
+    print(f"Unsupported compositions skipped: {len(unseen) - len(valid_formulas):,}")
+    print(f"Unseen compositions scored: {len(valid_formulas):,}")
+    print(f"Selected at threshold {threshold:.4f}: {len(results):,}")
+    print("Scores are not calibrated probabilities or evidence of physical stability.")
+    print(f"Wrote: {results_path}")
+    print(f"Wrote: {shortlist_path}")
+    print(f"Wrote: {summary_path}")
+    return 0
+
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())
