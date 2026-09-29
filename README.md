@@ -184,3 +184,15 @@ There is currently no DOI or peer-reviewed publication for this repository. Unti
 
 Author: Ata Berk Öztürk<br>
 Contact: ataberkozturk5a@gmail.com
+
+## REST API and Docker
+
+The trained classifier is also served over HTTP with FastAPI.
+
+```bash
+docker compose up --build
+curl -X POST localhost:8000/predict -H "Content-Type: application/json" \
+     -d '{"formulas": ["CrI3", "Fe2O3"]}'
+```
+
+Endpoints: `GET /health`, `GET /model` (version, threshold, test metrics), `POST /predict` (up to 1000 formulas). Interactive docs are at `http://localhost:8000/docs`. Scores are uncalibrated model outputs, not probabilities of a real magnetic phase.

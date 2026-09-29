@@ -1,0 +1,6 @@
+-r requirements.txt
+# model.joblib was trained with this exact version; other versions may fail to unpickle
+scikit-learn==1.7.2
+fastapi>=0.110,<1
+uvicorn[standard]>=0.29,<1
+httpx>=0.27,<1
