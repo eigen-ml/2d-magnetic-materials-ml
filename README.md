@@ -114,6 +114,8 @@ curl -X POST localhost:8000/predict -H "Content-Type: application/json" \
 
 Endpoints: `GET /health`, `GET /model` (version, threshold, test metrics), `POST /predict` (up to 1000 formulas per request). Interactive docs at `http://localhost:8000/docs`. Formulas with elements outside the training set are returned with an error instead of a score. Scores are uncalibrated model outputs, not probabilities that a real material is magnetic.
 
+For a public HTTPS deployment (API behind Caddy) see [deploy/README.md](deploy/README.md).
+
 <!-- Public demo URL goes here once it is deployed. -->
 
 ## Screening output
