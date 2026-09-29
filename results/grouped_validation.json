@@ -1,0 +1,132 @@
+{
+  "n_compositions": 127024,
+  "n_chemical_systems": 76925,
+  "median_compositions_per_chemical_system": 1.0,
+  "rule_contains_V_to_Ni": {
+    "accuracy": 0.5165795440231767,
+    "roc_auc": 0.7380513869955171,
+    "precision": 0.1372692275269059,
+    "recall": 0.9997953336062219,
+    "f1_score": 0.24139549823339015,
+    "confusion_matrix": {
+      "tn": 55848,
+      "fp": 61404,
+      "fn": 2,
+      "tp": 9770
+    }
+  },
+  "random": {
+    "pooled": {
+      "accuracy": 0.9921510895578788,
+      "roc_auc": 0.999041636502235,
+      "precision": 0.9584160484797827,
+      "recall": 0.9387024150634465,
+      "f1_score": 0.9484568060797188,
+      "confusion_matrix": {
+        "tn": 116854,
+        "fp": 398,
+        "fn": 599,
+        "tp": 9173
+      },
+      "average_precision": 0.990152477249795,
+      "positive_rate": 0.07693034387202419,
+      "n": 127024
+    },
+    "roc_auc_mean": 0.9990453542979619,
+    "roc_auc_std": 0.00014373249312756825,
+    "average_precision_mean": 0.9902107125322843,
+    "average_precision_std": 0.0011144409580640517,
+    "recall_mean": 0.9387021180240153,
+    "precision_mean": 0.9585051230780346
+  },
+  "chemsys": {
+    "pooled": {
+      "accuracy": 0.9918598060209094,
+      "roc_auc": 0.9989473606525441,
+      "precision": 0.9542524433354128,
+      "recall": 0.939214081047892,
+      "f1_score": 0.9466735430634347,
+      "confusion_matrix": {
+        "tn": 116812,
+        "fp": 440,
+        "fn": 594,
+        "tp": 9178
+      },
+      "average_precision": 0.9893703303647913,
+      "positive_rate": 0.07693034387202419,
+      "n": 127024
+    },
+    "roc_auc_mean": 0.9989491100653802,
+    "roc_auc_std": 0.00014256557187816786,
+    "average_precision_mean": 0.9893993759363037,
+    "average_precision_std": 0.0012798178804469514,
+    "recall_mean": 0.9391250184322993,
+    "precision_mean": 0.9545097696722677
+  },
+  "leave_element_out": {
+    "V": {
+      "n": 6190,
+      "positive_rate": 0.15088852988691437,
+      "roc_auc": 0.9869939606086977,
+      "average_precision": 0.9630818978411045,
+      "precision": 1.0,
+      "recall": 0.23126338329764454
+    },
+    "Cr": {
+      "n": 8673,
+      "positive_rate": 0.1781390522310619,
+      "roc_auc": 0.9418888634638365,
+      "average_precision": 0.8849162375195394,
+      "precision": 1.0,
+      "recall": 0.1372168284789644
+    },
+    "Mn": {
+      "n": 18644,
+      "positive_rate": 0.4123042265608239,
+      "roc_auc": 0.8776913321264046,
+      "average_precision": 0.8546125224234428,
+      "precision": 1.0,
+      "recall": 0.013659425003252243
+    },
+    "Fe": {
+      "n": 16093,
+      "positive_rate": 0.09880072081029019,
+      "roc_auc": 0.9837023743081567,
+      "average_precision": 0.9161600498046841,
+      "precision": 1.0,
+      "recall": 0.1918238993710692
+    },
+    "Co": {
+      "n": 12960,
+      "positive_rate": 0.11520061728395062,
+      "roc_auc": 0.9859198161520134,
+      "average_precision": 0.9240297213530888,
+      "precision": 1.0,
+      "recall": 0.19892833221701273
+    },
+    "Ni": {
+      "n": 16445,
+      "positive_rate": 0.0554575858923685,
+      "roc_auc": 0.9968209307631405,
+      "average_precision": 0.9484011239122043,
+      "precision": 1.0,
+      "recall": 0.3333333333333333
+    },
+    "Cu": {
+      "n": 6066,
+      "positive_rate": 0.03297065611605671,
+      "roc_auc": 0.9987240027275827,
+      "average_precision": 0.9718369945424186,
+      "precision": 0.7338403041825095,
+      "recall": 0.965
+    },
+    "Ti": {
+      "n": 10845,
+      "positive_rate": 0.024250806823420932,
+      "roc_auc": 0.9979055473352051,
+      "average_precision": 0.9294242472649862,
+      "precision": 0.7523510971786834,
+      "recall": 0.9125475285171103
+    }
+  }
+}

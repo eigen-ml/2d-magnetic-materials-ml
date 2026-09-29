@@ -75,7 +75,8 @@ def model_info() -> dict:
         "model_version": meta.get("model_version"),
         "threshold": state["threshold"],
         "n_features": meta.get("n_features"),
-        "metrics": meta.get("metrics"),
+        # current metadata uses "test_metrics"; the legacy hybrid model used "metrics"
+        "test_metrics": meta.get("test_metrics", meta.get("metrics")),
     }
 
 
@@ -116,5 +117,8 @@ def predict(request: PredictRequest) -> list[Prediction]:
             item = results[position]
             item.magnetic_score = float(score)
             item.predicted_magnetic = bool(score >= state["threshold"])
-            item.score_band = discover.score_band(float(score))
+            # bands describe scores above the threshold only
+            item.score_band = (
+                discover.score_band(float(score)) if item.predicted_magnetic else None
+            )
     return results
