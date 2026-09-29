@@ -2,7 +2,7 @@
 
 [![tests](https://github.com/eigen-ml/2d-magnetic-materials-ml/actions/workflows/tests.yml/badge.svg)](https://github.com/eigen-ml/2d-magnetic-materials-ml/actions/workflows/tests.yml)
 
-A gradient boosting classifier that predicts the magnetic label of 2D materials in the Virtual 2D Materials Database (V2DB) from chemical composition alone (elemental fractions and atom count of the reduced formula). This started as my undergraduate thesis at Ankara University. The model is a cheap first filter; it does not replace structure-aware or DFT calculations, and the labels it learns are themselves predictions made by the V2DB workflow.
+A gradient boosting classifier that predicts the magnetic label of 2D materials in the Virtual 2D Materials Database (V2DB) from chemical composition alone (elemental fractions and atom count of the reduced formula). It started as my undergraduate thesis at Ankara University; this is a revised version (see [Thesis version and this revision](#thesis-version-and-this-revision)). The model is a cheap first filter; it does not replace structure-aware or DFT calculations, and the labels it learns are themselves predictions made by the V2DB workflow.
 
 ## Results
 
@@ -46,9 +46,11 @@ What this means:
 
 Feature importance is impurity based. It shows what the model uses, not a physical mechanism.
 
-### About the older numbers (0.986 ROC-AUC, 90.6% recall)
+### Thesis version and this revision
 
-Earlier versions of this repository reported ROC-AUC 0.986 and recall 0.906 on 141,171 compositions. Those came from a C2DB + V2DB hybrid dataset, and the decision threshold was chosen on the same split used for testing. They are kept under `models/legacy_hybrid/`, `figures/legacy/`, `results/legacy/` and `data/legacy_hybrid/` for the record, but they are not comparable with the table above and should not be quoted as the current result.
+The undergraduate thesis (Ankara University, 2026) used a merged C2DB + V2DB dataset of 141,171 compositions and reported ROC-AUC 0.986 and recall 0.906 for magnetic ordering. That version is tagged [`thesis-2026`](../../tree/thesis-2026), and its model, data, figures and tables are kept unchanged under `models/legacy_hybrid/`, `data/legacy_hybrid/`, `figures/legacy/` and `results/legacy/`.
+
+This revision, done after the thesis, restricts the data to V2DB only, selects the decision threshold on a separate validation split and adds grouped and leave-one-element-out validation. The two sets of numbers use different data and evaluation protocols, so they are not directly comparable.
 
 ## Pipeline
 
