@@ -28,12 +28,11 @@ Leave-one-element-out (every composition containing the element is removed from 
 | Cu | 6,066 | 3% | 0.999 | 0.965 | 0.734 |
 | Ti | 10,845 | 2% | 0.998 | 0.913 | 0.752 |
 
-What this means:
+Inside the chemistry it was trained on, the model reproduces the V2DB label closely and is much more precise than the simple rule "contains a magnetic 3d metal" (precision 0.95 against 0.14).
 
-- Within the chemistry it has seen, the model reproduces the V2DB label very closely, and it is much better than the simple "has a magnetic 3d metal" rule (precision 0.95 vs 0.14).
-- Grouping by chemical system barely changes the score. V2DB has 76,925 distinct element sets and the median set holds a single composition, so this grouping ends up close to a random split. It is reported, but it is not a hard test.
-- Leave-one-element-out is the hard test, and the model mostly fails it. When V, Cr, Mn, Fe, Co or Ni is missing from training, recall at the chosen threshold drops to 1–33%. The ranking (ROC-AUC) stays fairly high, so the scores still carry some order, but the model cannot flag magnetism that comes from an element it has not seen. Mn alone accounts for about half of the feature importance.
-- In short: the classifier is useful for ranking compositions made of elements already in the training data. It should not be used to predict magnetism for chemistries built on new magnetic elements.
+Grouping the folds by chemical system hardly changes anything. V2DB has 76,925 distinct element sets and the median set contains a single composition, so this split ends up close to a random one.
+
+Leaving one element out is the harder test, and here the model mostly fails. Without V, Cr, Mn, Fe, Co or Ni in training, recall at the chosen threshold falls to 1–33%. ROC-AUC stays fairly high, so the ranking still carries some information, but magnetism that comes from an unseen element is not flagged. Mn alone takes about half of the feature importance. The classifier is therefore useful for ranking compositions built from elements it has seen, and not for new magnetic elements.
 
 <p>
   <img src="figures/eval_roc.png" width="48%" alt="ROC curves for the held-out test split, grouped CV and leave-element-out cases">
