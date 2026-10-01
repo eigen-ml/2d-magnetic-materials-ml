@@ -1,0 +1,11 @@
+{$DOMAIN} {
+	encode gzip
+	request_body {
+		max_size 256KB
+	}
+	reverse_proxy api:8000
+	log {
+		output stdout
+		format console
+	}
+}

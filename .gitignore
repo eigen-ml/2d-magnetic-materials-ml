@@ -32,14 +32,10 @@ Thumbs.db
 slurm-*.out
 *.prof
 
-# Reproducible pipeline outputs. Historical files already tracked by Git are
-# unaffected by these rules; newly generated artefacts stay local by default.
+# Pipeline outputs. The current model, evaluation summaries and figures are
+# tracked because the README and the API image use them; bulky or easily
+# regenerated files stay local.
 /data/combined_dataset.csv
 /data/known_materials.txt
-/models/*.joblib
-/models/*.npy
-/models/*.csv
-/models/*.json
-/results/*
-!/results/.gitkeep
-/figures/fig*.png
+/results/*.csv.gz
+/results/screened_candidates.csv
