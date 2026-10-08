@@ -2,41 +2,25 @@
 
 [![tests](https://github.com/eigen-ml/2d-magnetic-materials-ml/actions/workflows/tests.yml/badge.svg)](https://github.com/eigen-ml/2d-magnetic-materials-ml/actions/workflows/tests.yml)
 
-This is my undergraduate thesis at Ankara University (2026). I trained a gradient boosting classifier that predicts from the chemical formula alone whether a 2D material is magnetic. The model sees only the element fractions and the atom count of the reduced formula, not the crystal structure. I then used it to score 2,036 made-up formulas that were not in the data. It is meant as a cheap first filter before DFT, not a replacement for it.
+This is my undergraduate thesis at Ankara University (2026). I trained a gradient boosting classifier that predicts from the chemical formula alone whether a 2D material is magnetic. The model sees only the element fractions and the atom count of the reduced formula, not the crystal structure. I then used it to score made-up formulas that were not in the data. It is meant as a cheap first filter before DFT, not a replacement for it.
 
 ## Thesis result
 
-Version tagged [`thesis-2026`](../../tree/thesis-2026). C2DB and V2DB merged into 141,171 compositions, 14,601 of them labelled magnetic. 80/20 train/test split, decision threshold 0.5.
-
-| Test metric | Value |
+| | |
 | --- | --- |
-| ROC-AUC | 0.986 |
+| Data | 141,171 compositions from C2DB and V2DB, 14,601 magnetic |
+| ROC-AUC (20% test split) | 0.986 |
 | Recall | 0.906 |
 | Precision | 0.756 |
-| F1 | 0.824 |
-| Accuracy | 0.960 |
-
-Screening: 2,528 formulas generated from fixed element lists, 492 already in the data, 2,036 scored. 1,472 scored above 0.5 and 377 scored 0.95 or higher. None of the 377 has been checked with DFT. They are unverified candidates.
+| Candidates | 377 new formulas with a score of 0.95 or higher |
+| Checked with DFT | None. The 377 are unverified candidates. |
+| Version | tag [`thesis-2026`](../../tree/thesis-2026) |
 
 <img src="figures/legacy/fig3_discovery_results.png" width="80%" alt="Score distribution and candidate counts of the thesis screening">
 
-Model, data and results of this version are kept unchanged under `models/legacy_hybrid/`, `data/legacy_hybrid/` and `results/legacy/`.
+## What the re-check shows
 
-## Stricter re-check
-
-After the thesis I redid the work with stricter rules: V2DB only, a separate validation split for choosing the threshold, and two harder tests. 127,024 compositions remain after removing 2,231 formulas whose structures disagree on the label.
-
-| Evaluation | ROC-AUC | Recall | Precision |
-| --- | --- | --- | --- |
-| Test split (20%, threshold chosen on validation) | 0.999 | 0.943 | 0.949 |
-| 5-fold CV grouped by chemical system | 0.999 | 0.939 | 0.955 |
-| Rule: "contains V, Cr, Mn, Fe, Co or Ni" | – | 1.000 | 0.137 |
-
-The 0.999 is high because the V2DB labels are themselves predictions of an ML model, so this model is mostly learning to copy that model. It is not a sign that composition alone explains magnetism.
-
-The two results that say more:
-
-**Rule comparison.** The simple rule catches every magnetic composition, but only 14% of what it flags is magnetic. The model finds 94% of them with 95% precision, so it learns more than "has a magnetic metal".
+After the thesis I redid the work with stricter rules: V2DB only, a separate validation split for choosing the threshold, and two harder tests. 127,024 compositions remain after removing 2,231 formulas whose structures disagree on the label. The two harder tests are the main result.
 
 **Leave one element out.** Every composition that contains the element is removed from training and used as the test set. For V, Cr, Mn, Fe, Co and Ni, recall drops to between 1% and 33%. The model does not flag magnetism that comes from an element it has not seen.
 
@@ -51,9 +35,27 @@ The two results that say more:
 | Cu | 6,066 | 3% | 0.999 | 0.965 | 0.734 |
 | Ti | 10,845 | 2% | 0.998 | 0.913 | 0.752 |
 
+**Rule comparison.** The rule "contains V, Cr, Mn, Fe, Co or Ni" misses just 2 of the 9,772 magnetic compositions, but only 14% of what it flags is magnetic. The model finds 94% of them with 95% precision, so it learns more than "has a magnetic metal".
+
+| Evaluation | ROC-AUC | Recall | Precision |
+| --- | --- | --- | --- |
+| Rule: "contains V, Cr, Mn, Fe, Co or Ni" | – | 1.000 | 0.137 |
+| Model, test split (20%, threshold chosen on validation) | 0.999 | 0.943 | 0.949 |
+| Model, 5-fold CV grouped by chemical system | 0.999 | 0.939 | 0.955 |
+
+Why 0.999: the V2DB labels are themselves predictions of an ML model, so this model mostly learns to copy that model. It does not show that composition alone explains magnetism.
+
 So the model is useful for ranking compositions made of elements it has seen, and not for new magnetic elements. The thesis and re-check numbers use different data and test setups, so they should not be compared directly.
 
 ## Details
+
+### Thesis version
+
+C2DB and V2DB merged into 141,171 compositions. 80/20 train/test split, decision threshold 0.5. F1 on the test split is 0.824 and accuracy 0.960.
+
+Screening: 2,528 formulas generated from fixed element lists, 492 already in the data, 2,036 scored. 1,472 scored above 0.5 and 377 scored 0.95 or higher. None of them has been checked with DFT.
+
+Model, data and results of this version are kept unchanged under `models/legacy_hybrid/`, `data/legacy_hybrid/` and `results/legacy/`.
 
 ### Notes on the re-check
 
