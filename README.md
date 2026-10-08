@@ -52,12 +52,12 @@ So the model is useful for ranking compositions made of elements it has seen, an
 
 C2DB and V2DB merged into 141,171 compositions. 80/20 train/test split, decision threshold 0.5. F1 on the test split is 0.824 and accuracy 0.960.
 
-Screening: 2,528 formulas generated from fixed element lists, 492 already in the data, 2,036 scored. 1,472 scored above 0.5 and 377 scored 0.95 or higher. None of them has been checked with DFT.
+Screening: 2,528 formulas generated from fixed element lists, 492 already in the data, 2,036 scored. 1,472 scored above 0.5 and 377 scored 0.95 or higher. None of them has been checked with DFT. All 377 are in [`results/legacy/novel_candidates.csv`](results/legacy/novel_candidates.csv), in the rows with `confidence` set to `Very High`. The local demo (`demo/`) also lists them with an element filter.
 
 <details>
 <summary>Top 50 thesis candidates (unverified)</summary>
 
-Ranked by the thesis model score, from `results/legacy/dft_candidates.csv`. Scores go from 0.9993 down to 0.9973. They are uncalibrated model scores, not probabilities, and none of these compositions has been checked with DFT.
+Same order as Appendix Table A.1 of the thesis, from [`results/legacy/dft_candidates.csv`](results/legacy/dft_candidates.csv). Scores go from 0.9993 down to 0.9973. They are uncalibrated model scores, not probabilities, and none of these compositions has been checked with DFT.
 
 | 1–10 | 11–20 | 21–30 | 31–40 | 41–50 |
 | --- | --- | --- | --- | --- |
