@@ -249,7 +249,6 @@ with tab_card:
     revised_metrics = revised_meta["test_metrics"]
     validation = load_json("results/grouped_validation.json")
     rule = validation["rule_contains_V_to_Ni"]
-    grouped = validation["chemsys"]["pooled"]
     leo = pd.DataFrame.from_dict(validation["leave_element_out"], orient="index")
     leo.index.name = "element"
     magnetic_metals = ["V", "Cr", "Mn", "Fe", "Co", "Ni"]
@@ -285,18 +284,10 @@ with tab_card:
     st.dataframe(
         pd.DataFrame(
             {
-                "değerlendirme": [
-                    "kural (V, Cr, Mn, Fe, Co, Ni)",
-                    "revize model, test kümesi",
-                    "revize model, kimyasal sisteme göre gruplu 5-fold CV",
-                ],
-                "ROC-AUC": [None, revised_metrics["roc_auc"], grouped["roc_auc"]],
-                "recall": [rule["recall"], revised_metrics["recall"], grouped["recall"]],
-                "precision": [
-                    rule["precision"],
-                    revised_metrics["precision"],
-                    grouped["precision"],
-                ],
+                "değerlendirme": ["kural (V, Cr, Mn, Fe, Co, Ni)", "revize model, test kümesi"],
+                "ROC-AUC": [None, revised_metrics["roc_auc"]],
+                "recall": [rule["recall"], revised_metrics["recall"]],
+                "precision": [rule["precision"], revised_metrics["precision"]],
             }
         ),
         hide_index=True,
