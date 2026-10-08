@@ -2,20 +2,43 @@
 
 [![tests](https://github.com/eigen-ml/2d-magnetic-materials-ml/actions/workflows/tests.yml/badge.svg)](https://github.com/eigen-ml/2d-magnetic-materials-ml/actions/workflows/tests.yml)
 
-A gradient boosting classifier that predicts the magnetic label of 2D materials in the Virtual 2D Materials Database (V2DB) from chemical composition alone (elemental fractions and atom count of the reduced formula). It started as my undergraduate thesis at Ankara University; this is a revised version (see [Thesis version and this revision](#thesis-version-and-this-revision)). The model is a cheap first filter; it does not replace structure-aware or DFT calculations, and the labels it learns are themselves predictions made by the V2DB workflow.
+This is my undergraduate thesis at Ankara University (2026). I trained a gradient boosting classifier that predicts from the chemical formula alone whether a 2D material is magnetic. The model sees only the element fractions and the atom count of the reduced formula, not the crystal structure. I then used it to score 2,036 made-up formulas that were not in the data. It is meant as a cheap first filter before DFT, not a replacement for it.
 
-## Results
+## Thesis result
 
-127,024 unique compositions after cleaning (9,772 labelled magnetic, 7.7%). All numbers below come from files in `results/` and `models/metadata.json` and can be regenerated with the commands in [Reproducing](#reproducing).
+Version tagged [`thesis-2026`](../../tree/thesis-2026). C2DB and V2DB merged into 141,171 compositions, 14,601 of them labelled magnetic. 80/20 train/test split, decision threshold 0.5.
 
-| Evaluation | ROC-AUC | Average precision | Recall | Precision |
-| --- | --- | --- | --- | --- |
-| Held-out test split (20%, threshold chosen on validation) | 0.999 | – | 0.943 | 0.949 |
-| Random stratified 5-fold CV | 0.999 ± 0.000 | 0.990 ± 0.001 | 0.939 | 0.959 |
-| 5-fold CV grouped by chemical system | 0.999 ± 0.000 | 0.989 ± 0.001 | 0.939 | 0.955 |
-| Rule baseline: "contains V, Cr, Mn, Fe, Co or Ni" | – | – | 1.000 | 0.137 |
+| Test metric | Value |
+| --- | --- |
+| ROC-AUC | 0.986 |
+| Recall | 0.906 |
+| Precision | 0.756 |
+| F1 | 0.824 |
+| Accuracy | 0.960 |
 
-Leave-one-element-out (every composition containing the element is removed from training and used as the test set):
+Screening: 2,528 formulas generated from fixed element lists, 492 already in the data, 2,036 scored. 1,472 scored above 0.5 and 377 scored 0.95 or higher. None of the 377 has been checked with DFT. They are unverified candidates.
+
+<img src="figures/legacy/fig3_discovery_results.png" width="80%" alt="Score distribution and candidate counts of the thesis screening">
+
+Model, data and results of this version are kept unchanged under `models/legacy_hybrid/`, `data/legacy_hybrid/` and `results/legacy/`.
+
+## Stricter re-check
+
+After the thesis I redid the work with stricter rules: V2DB only, a separate validation split for choosing the threshold, and two harder tests. 127,024 compositions remain after removing 2,231 formulas whose structures disagree on the label.
+
+| Evaluation | ROC-AUC | Recall | Precision |
+| --- | --- | --- | --- |
+| Test split (20%, threshold chosen on validation) | 0.999 | 0.943 | 0.949 |
+| 5-fold CV grouped by chemical system | 0.999 | 0.939 | 0.955 |
+| Rule: "contains V, Cr, Mn, Fe, Co or Ni" | – | 1.000 | 0.137 |
+
+The 0.999 is high because the V2DB labels are themselves predictions of an ML model, so this model is mostly learning to copy that model. It is not a sign that composition alone explains magnetism.
+
+The two results that say more:
+
+**Rule comparison.** The simple rule catches every magnetic composition, but only 14% of what it flags is magnetic. The model finds 94% of them with 95% precision, so it learns more than "has a magnetic metal".
+
+**Leave one element out.** Every composition that contains the element is removed from training and used as the test set. For V, Cr, Mn, Fe, Co and Ni, recall drops to between 1% and 33%. The model does not flag magnetism that comes from an element it has not seen.
 
 | Held-out element | Test compositions | Magnetic share | ROC-AUC | Recall | Precision |
 | --- | --- | --- | --- | --- | --- |
@@ -28,30 +51,26 @@ Leave-one-element-out (every composition containing the element is removed from 
 | Cu | 6,066 | 3% | 0.999 | 0.965 | 0.734 |
 | Ti | 10,845 | 2% | 0.998 | 0.913 | 0.752 |
 
-Inside the chemistry it was trained on, the model reproduces the V2DB label closely and is much more precise than the simple rule "contains a magnetic 3d metal" (precision 0.95 against 0.14).
+So the model is useful for ranking compositions made of elements it has seen, and not for new magnetic elements. The thesis and re-check numbers use different data and test setups, so they should not be compared directly.
 
-Grouping the folds by chemical system hardly changes anything. V2DB has 76,925 distinct element sets and the median set contains a single composition, so this split ends up close to a random one.
+## Details
 
-Leaving one element out is the harder test, and here the model mostly fails. Without V, Cr, Mn, Fe, Co or Ni in training, recall at the chosen threshold falls to 1–33%. ROC-AUC stays fairly high, so the ranking still carries some information, but magnetism that comes from an unseen element is not flagged. Mn alone takes about half of the feature importance. The classifier is therefore useful for ranking compositions built from elements it has seen, and not for new magnetic elements.
+### Notes on the re-check
+
+Grouping the folds by chemical system hardly changes the result. V2DB has 76,925 distinct element sets and at least half of them contain a single composition, so this split ends up close to a random one.
+
+Mn alone takes about half of the feature importance. Feature importance here is impurity based. It shows what the model uses, not a physical mechanism.
 
 <p>
-  <img src="figures/eval_roc.png" width="48%" alt="ROC curves for the held-out test split, grouped CV and leave-element-out cases">
+  <img src="figures/eval_roc.png" width="48%" alt="ROC curves for the test split, grouped CV and leave-element-out cases">
   <img src="figures/eval_leave_element_out.png" width="50%" alt="ROC-AUC and recall for each held-out element">
 </p>
 <p>
-  <img src="figures/eval_confusion_matrix.png" width="62%" alt="Confusion matrices for the held-out test split and the grouped CV">
+  <img src="figures/eval_confusion_matrix.png" width="62%" alt="Confusion matrices for the test split and the grouped CV">
   <img src="figures/eval_feature_importance.png" width="36%" alt="Top 15 feature importances">
 </p>
 
-Feature importance is impurity based. It shows what the model uses, not a physical mechanism.
-
-### Thesis version and this revision
-
-The undergraduate thesis (Ankara University, 2026) used a merged C2DB + V2DB dataset of 141,171 compositions and reported ROC-AUC 0.986 and recall 0.906 for magnetic ordering. That version is tagged [`thesis-2026`](../../tree/thesis-2026), and its model, data, figures and tables are kept unchanged under `models/legacy_hybrid/`, `data/legacy_hybrid/`, `figures/legacy/` and `results/legacy/`.
-
-This revision, done after the thesis, restricts the data to V2DB only, selects the decision threshold on a separate validation split and adds grouped and leave-one-element-out validation. The two sets of numbers use different data and evaluation protocols, so they are not directly comparable.
-
-## Pipeline
+### Pipeline (re-check)
 
 ```text
 V2DB CSV (formula, prototype, magnetic label)
@@ -65,7 +84,7 @@ V2DB CSV (formula, prototype, magnetic label)
   -> score a small enumerated set of compositions not in V2DB
 ```
 
-## Repository layout
+### Repository layout
 
 ```text
 scripts/02_prepare_data.py        clean V2DB, build consensus labels
@@ -78,10 +97,10 @@ api/main.py                       FastAPI service for the trained model
 models/                           current model, threshold and metadata
 results/                          CV summaries and screening outputs
 tests/                            pytest suite (runs in CI)
-*/legacy*                         artefacts of the old hybrid run
+*/legacy*                         artefacts of the thesis version
 ```
 
-## Reproducing
+### Reproducing
 
 Python 3.10+.
 
@@ -101,11 +120,11 @@ python figures/06_evaluation_figures.py
 python -m pytest -q
 ```
 
-The committed `models/model.joblib` was trained with scikit-learn 1.7.2. joblib files are pickles; only load models you trained yourself or trust.
+The committed `models/model.joblib` was trained with scikit-learn 1.7.2. joblib files are pickles, so only load models you trained yourself or trust.
 
-## REST API
+### REST API
 
-The trained model is served with FastAPI. The API loads the same artefacts as `scripts/04_discover.py`.
+The trained model is served with FastAPI. The API loads the same files as `scripts/04_discover.py`.
 
 ```bash
 docker compose up --build
@@ -113,24 +132,24 @@ curl -X POST localhost:8000/predict -H "Content-Type: application/json" \
      -d '{"formulas": ["CrI3", "MoS2"]}'
 ```
 
-Endpoints: `GET /health`, `GET /model` (version, threshold, test metrics), `POST /predict` (up to 1000 formulas per request). Interactive docs at `http://localhost:8000/docs`. Formulas with elements outside the training set are returned with an error instead of a score. Scores are uncalibrated model outputs, not probabilities that a real material is magnetic.
+Endpoints: `GET /health`, `GET /model` (version, threshold, test metrics), `POST /predict` (up to 1000 formulas per request). Interactive docs at `http://localhost:8000/docs`. Formulas with elements outside the training set get an error instead of a score. Scores are uncalibrated model outputs, not probabilities that a real material is magnetic.
 
 For a public HTTPS deployment (API behind Caddy) see [deploy/README.md](deploy/README.md).
 
 <!-- Public demo URL goes here once it is deployed. -->
 
-## Screening output
+### Screening output (re-check)
 
-`scripts/04_discover.py` builds 2,528 binary and ternary formulas from fixed element lists, removes the 212 that already exist in V2DB and scores the remaining 2,316. 432 pass the validation threshold (`results/candidate_shortlist.csv`). These are compositions to look at with a structure-aware workflow, not new materials: no crystal structure, stability or charge balance is checked, and given the leave-element-out results the scores are only as good as the training chemistry around them.
+`scripts/04_discover.py` builds 2,528 binary and ternary formulas from fixed element lists, removes the 212 that already exist in V2DB and scores the remaining 2,316. 432 pass the validation threshold (`results/candidate_shortlist.csv`). These are compositions to look at with a structure-aware method, not new materials. No crystal structure, stability or charge balance is checked.
 
-## Limitations
+### Limitations
 
 - The target is the V2DB magnetic label, which is itself an ML prediction trained on C2DB data, not a DFT calculation done here.
 - Composition-only features ignore structure, coordination, oxidation state, magnetic configuration and spin–orbit coupling.
 - Removing formulas with conflicting labels across prototypes gives a cleaner target but narrows the question.
-- Scores are not calibrated, and the model does not generalise to unseen magnetic elements (see the leave-element-out table).
+- Scores are not calibrated, and the model does not generalise to unseen magnetic elements.
 
-## Data and license
+### Data and license
 
 Code is MIT licensed. The license does not cover V2DB or files derived from it; see [DATASET_NOTES.md](DATASET_NOTES.md) for provenance and checksums. V2DB is described by its authors as CC BY 4.0. If you use the data, cite:
 
