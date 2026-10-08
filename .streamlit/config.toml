@@ -1,0 +1,11 @@
+# streamlit run demo/app.py komutu repo kökünden çalıştırılınca bu dosya okunur.
+[browser]
+# Streamlit'in kullanım istatistiği göndermesini kapatır; demo internetsiz çalışır.
+gatherUsageStats = false
+
+[theme]
+base = "light"
+
+[server]
+# Uygulama yalnız bu bilgisayardan açılır, aynı Wi-Fi'deki başka cihazlardan açılamaz.
+address = "localhost"
