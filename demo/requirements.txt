@@ -1,0 +1,8 @@
+# Demo ortamı. Modeller scikit-learn 1.7.2 ile kaydedildi; bu sürüm değişmemeli.
+scikit-learn==1.7.2
+joblib==1.6.0
+numpy==2.4.4
+pandas==3.0.3
+pymatgen==2026.9.24
+matplotlib==3.11.2
+streamlit==1.65.0
