@@ -41,7 +41,6 @@ After the thesis I redid the work with stricter rules: V2DB only, a separate val
 | --- | --- | --- | --- |
 | Rule: "contains V, Cr, Mn, Fe, Co or Ni" | – | 1.000 | 0.137 |
 | Model, test split (20%, threshold chosen on validation) | 0.999 | 0.943 | 0.949 |
-| Model, 5-fold CV grouped by chemical system | 0.999 | 0.939 | 0.955 |
 
 Why 0.999: the V2DB labels are themselves predictions of an ML model, so this model mostly learns to copy that model. It does not show that composition alone explains magnetism.
 
@@ -59,7 +58,7 @@ Model, data and results of this version are kept unchanged under `models/legacy_
 
 ### Notes on the re-check
 
-Grouping the folds by chemical system hardly changes the result. V2DB has 76,925 distinct element sets and at least half of them contain a single composition, so this split ends up close to a random one.
+Grouping the folds by chemical system hardly changes the result: 5-fold CV split this way gives recall 0.939 and precision 0.954, close to the test split. V2DB has 76,925 distinct element sets and at least half of them contain a single composition, so this split ends up close to a random one.
 
 Mn alone takes about half of the feature importance. Feature importance here is impurity based. It shows what the model uses, not a physical mechanism.
 
@@ -142,7 +141,7 @@ For a public HTTPS deployment (API behind Caddy) see [deploy/README.md](deploy/R
 
 ### Screening output (re-check)
 
-`scripts/04_discover.py` builds 2,528 binary and ternary formulas from fixed element lists, removes the 212 that already exist in V2DB and scores the remaining 2,316. 432 pass the validation threshold (`results/candidate_shortlist.csv`). These are compositions to look at with a structure-aware method, not new materials. No crystal structure, stability or charge balance is checked.
+`scripts/04_discover.py` builds 2,528 binary and ternary formulas from fixed element lists, removes the 212 that already exist in V2DB and scores the remaining 2,316 with the re-check model. 432 pass its threshold (0.654) and 239 of them score 0.95 or higher. These are not the thesis 377. The model and the reference data are different, and 432 uses a lower cutoff than 0.95. The top 50 are in `results/candidate_shortlist.csv`; the full list of 432 is written to `results/screened_candidates.csv`, which is not committed. These are compositions to look at with a structure-aware method, not new materials. No crystal structure, stability or charge balance is checked.
 
 ### Limitations
 
