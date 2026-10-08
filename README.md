@@ -54,6 +54,26 @@ C2DB and V2DB merged into 141,171 compositions. 80/20 train/test split, decision
 
 Screening: 2,528 formulas generated from fixed element lists, 492 already in the data, 2,036 scored. 1,472 scored above 0.5 and 377 scored 0.95 or higher. None of them has been checked with DFT.
 
+<details>
+<summary>Top 50 thesis candidates (unverified)</summary>
+
+Ranked by the thesis model score, from `results/legacy/dft_candidates.csv`. Scores go from 0.9993 down to 0.9973. They are uncalibrated model scores, not probabilities, and none of these compositions has been checked with DFT.
+
+| 1–10 | 11–20 | 21–30 | 31–40 | 41–50 |
+| --- | --- | --- | --- | --- |
+| 1. Mn<sub>2</sub>CrBr<sub>4</sub> | 11. Mn<sub>2</sub>CrS<sub>4</sub> | 21. Mn<sub>2</sub>FeF<sub>4</sub> | 31. Mn<sub>2</sub>VTe<sub>4</sub> | 41. MnCrCl<sub>3</sub> |
+| 2. Mn<sub>2</sub>CrCl<sub>4</sub> | 12. Mn<sub>2</sub>VCl<sub>4</sub> | 22. CrFeBr<sub>3</sub> | 32. Mn<sub>2</sub>CoF<sub>4</sub> | 42. Mn<sub>2</sub>VS<sub>4</sub> |
+| 3. Mn<sub>2</sub>CrI<sub>4</sub> | 13. Mn<sub>2</sub>CrTe<sub>4</sub> | 23. MnFeBr<sub>3</sub> | 33. Fe<sub>2</sub>CoI<sub>4</sub> | 43. Cr<sub>2</sub>FeO<sub>4</sub> |
+| 4. Mn<sub>2</sub>CrF<sub>4</sub> | 14. Mn<sub>2</sub>FeBr<sub>4</sub> | 24. Fe<sub>2</sub>CoBr<sub>4</sub> | 34. CrFeCl<sub>3</sub> | 44. Fe<sub>2</sub>CoO<sub>4</sub> |
+| 5. Mn<sub>2</sub>FeO<sub>4</sub> | 15. MnCrBr<sub>3</sub> | 25. Mn<sub>2</sub>CoO<sub>4</sub> | 35. Mn<sub>2</sub>FeTe<sub>4</sub> | 45. Mn<sub>2</sub>CoS<sub>4</sub> |
+| 6. Mn<sub>2</sub>CrO<sub>4</sub> | 16. Mn<sub>2</sub>VBr<sub>4</sub> | 26. FeCoCl<sub>3</sub> | 36. Cr<sub>2</sub>FeCl<sub>4</sub> | 46. MnFeO<sub>3</sub> |
+| 7. Mn<sub>2</sub>FeCl<sub>4</sub> | 17. Cr<sub>2</sub>CoCl<sub>4</sub> | 27. Mn<sub>2</sub>CoBr<sub>4</sub> | 37. Mn<sub>2</sub>NiCl<sub>4</sub> | 47. MnCoBr<sub>3</sub> |
+| 8. Mn<sub>2</sub>FeI<sub>4</sub> | 18. FeCoBr<sub>3</sub> | 28. V(CrCl<sub>2</sub>)<sub>2</sub> | 38. Mn<sub>2</sub>VI<sub>4</sub> | 48. Mn<sub>2</sub>NiO<sub>4</sub> |
+| 9. Mn<sub>2</sub>CoCl<sub>4</sub> | 19. Mn<sub>2</sub>FeS<sub>4</sub> | 29. Fe<sub>2</sub>CoF<sub>4</sub> | 39. CrCoBr<sub>3</sub> | 49. MnCoCl<sub>3</sub> |
+| 10. Fe<sub>2</sub>CoCl<sub>4</sub> | 20. Mn<sub>2</sub>NiBr<sub>4</sub> | 30. Mn<sub>2</sub>CoI<sub>4</sub> | 40. MnFeCl<sub>3</sub> | 50. Cr<sub>2</sub>FeBr<sub>4</sub> |
+
+</details>
+
 Model, data and results of this version are kept unchanged under `models/legacy_hybrid/`, `data/legacy_hybrid/` and `results/legacy/`.
 
 ### Notes on the re-check
