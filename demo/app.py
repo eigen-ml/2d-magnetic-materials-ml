@@ -247,6 +247,65 @@ with tab_card:
     )
     thesis_metrics = thesis_meta["metrics"]
     revised_metrics = revised_meta["test_metrics"]
+    validation = load_json("results/grouped_validation.json")
+    rule = validation["rule_contains_V_to_Ni"]
+    grouped = validation["chemsys"]["pooled"]
+    leo = pd.DataFrame.from_dict(validation["leave_element_out"], orient="index")
+    leo.index.name = "element"
+    magnetic_metals = ["V", "Cr", "Mn", "Fe", "Co", "Ni"]
+    leo_recall = leo.loc[magnetic_metals, "recall"]
+
+    st.subheader("Revize model: asıl sonuç")
+    st.write(
+        f"Revize modelin test ROC-AUC'si {revised_metrics['roc_auc']:.3f}. Bu yüksek, çünkü "
+        "V2DB etiketlerinin kendisi bir ML modelinin tahmini ve revize model büyük ölçüde o "
+        "modeli taklit ediyor. Modelin ne öğrendiğini aşağıdaki iki test daha iyi gösteriyor."
+    )
+
+    st.markdown("**Leave-element-out**")
+    st.write(
+        "Her satırda o elementi içeren bütün kompozisyonlar eğitimden çıkarıldı ve "
+        "yalnız onlar test edildi. Model bu elementi hiç görmeden skor üretiyor. "
+        f"V, Cr, Mn, Fe, Co ve Ni için recall %{leo_recall.min() * 100:.0f} ile "
+        f"%{leo_recall.max() * 100:.0f} arasında. Model görmediği bir elementten gelen "
+        "manyetikliği yakalamıyor."
+    )
+    st.dataframe(leo.reset_index(), hide_index=True)
+    st.caption("Kaynak: results/grouped_validation.json (scripts/05_grouped_validation.py).")
+
+    st.markdown("**Kural ile karşılaştırma**")
+    rule_cm = rule["confusion_matrix"]
+    st.write(
+        "Kural: kompozisyonda V, Cr, Mn, Fe, Co veya Ni varsa 'manyetik' de. "
+        f"Kural {rule_cm['fn'] + rule_cm['tp']} manyetik kompozisyondan yalnız "
+        f"{rule_cm['fn']} tanesini kaçırıyor, ama işaretlediği kompozisyonlarda manyetik "
+        f"oranı yalnız %{rule['precision'] * 100:.0f}. Model 'manyetik metal var mı' "
+        "sorusundan fazlasını öğreniyor."
+    )
+    st.dataframe(
+        pd.DataFrame(
+            {
+                "değerlendirme": [
+                    "kural (V, Cr, Mn, Fe, Co, Ni)",
+                    "revize model, test kümesi",
+                    "revize model, kimyasal sisteme göre gruplu 5-fold CV",
+                ],
+                "ROC-AUC": [None, revised_metrics["roc_auc"], grouped["roc_auc"]],
+                "recall": [rule["recall"], revised_metrics["recall"], grouped["recall"]],
+                "precision": [
+                    rule["precision"],
+                    revised_metrics["precision"],
+                    grouped["precision"],
+                ],
+            }
+        ),
+        hide_index=True,
+    )
+    st.caption(
+        "Kural evet/hayır cevabı verir, skor sıralamaz, o yüzden ROC-AUC yazılmadı."
+    )
+
+    st.subheader("Test metrikleri")
     names = {
         "accuracy": "accuracy",
         "roc_auc": "ROC-AUC",
@@ -280,7 +339,8 @@ with tab_card:
     st.caption(
         "Kaynak: models/legacy_hybrid/metadata.json ve models/metadata.json. "
         f"Revize modelin eşiği {revised_meta['threshold_selection']['selected_on']} "
-        "üzerinde seçildi."
+        "üzerinde seçildi. Revize modelin ROC-AUC'si yüksek, çünkü V2DB etiketleri bir ML "
+        "modelinin tahmini. Asıl sonuç için yukarıdaki iki teste bakın."
     )
 
     st.subheader("Karışıklık matrisi (test kümesi)")
@@ -309,14 +369,3 @@ with tab_card:
             load_csv(path).sort_values("importance", ascending=False).head(10),
             hide_index=True,
         )
-
-    st.subheader("Leave-element-out (revize model)")
-    st.write(
-        "Her satırda o elementi içeren bütün kompozisyonlar eğitimden çıkarıldı ve "
-        "yalnız onlar test edildi. Model bu elementi hiç görmeden skor üretiyor."
-    )
-    validation = load_json("results/grouped_validation.json")
-    leo = pd.DataFrame.from_dict(validation["leave_element_out"], orient="index")
-    leo.index.name = "element"
-    st.dataframe(leo.reset_index(), hide_index=True)
-    st.caption("Kaynak: results/grouped_validation.json (scripts/05_grouped_validation.py).")

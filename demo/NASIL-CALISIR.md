@@ -47,7 +47,7 @@ Tarayıcı `http://localhost:8501` adresini açar. İlk açılışta V2DB etiket
 
 **Adaylar sekmesi.** `results/legacy/novel_candidates.csv` içinden `confidence` sütunu "Very High" olanlar (tez scriptinde skor 0,95 ve üstü). Sayı dosyadan hesaplanır ve `discovery_summary.json` ile yan yana gösterilir. "Yeniden hesapla" düğmesi 1.472 formülü tez modeliyle yeniden skorlar ve dosyadaki skorla en büyük farkı yazar.
 
-**Model kartı.** Metrikler ve karışıklık matrisi `metadata.json` dosyalarından, önemli özellikler `feature_importance.csv` dosyalarından, leave-element-out tablosu `results/grouped_validation.json` dosyasından okunur.
+**Model kartı.** Önce revize modelin asıl sonucu gelir: leave-element-out tablosu ve "V, Cr, Mn, Fe, Co veya Ni içeriyorsa manyetik" kuralıyla karşılaştırma. İkisi de `results/grouped_validation.json` dosyasından okunur. Revize modelin 0,999 ROC-AUC'si burada açıklamasıyla verilir: V2DB etiketleri bir ML modelinin tahmini, revize model büyük ölçüde onu taklit ediyor. Sonra test metrikleri ve karışıklık matrisi `metadata.json` dosyalarından, önemli özellikler `feature_importance.csv` dosyalarından gelir.
 
 ## Ayarlar
 
