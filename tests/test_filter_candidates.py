@@ -18,9 +18,11 @@ def test_optimade_formula_spellings(filter_module):
         ("Mn2FeO4", True, True),  # Mn+3, Fe+2
         ("CrI3", True, True),
         ("MoS2", True, True),
+        ("MnCoCl3", False, False),  # needs Co+1, 0.8% of cobalt's ICSD entries
     ],
 )
 def test_charge_assignment(filter_module, formula, balanced, ordered):
+    pytest.importorskip("smact")
     is_balanced, is_ordered, assignment = filter_module.charge_assignment(formula)
     assert (is_balanced, is_ordered) == (balanced, ordered)
     if balanced:
@@ -29,6 +31,7 @@ def test_charge_assignment(filter_module, formula, balanced, ordered):
 
 
 def test_formula_variants_put_cations_in_every_order(filter_module):
+    pytest.importorskip("smact")
     _, _, assignment = filter_module.charge_assignment("Mn2FeO4")
     assert set(filter_module.formula_variants("Mn2FeO4", assignment)) == {"FeMn2O4", "Mn2FeO4"}
 
@@ -99,25 +102,33 @@ def test_literature_check_counts_only_2d_mentions(filter_module, tmp_path):
     assert result["literature_2d_hits"] == 1
 
 
-def test_select_groups_caps_each_family(filter_module):
-    rows = []
-    for i, family in enumerate(["F1", "F1", "F1", "F2", "F3"]):
-        rows.append(
-            {
-                "formula": f"X{i}", "formula_plain": f"X{i}", "family": family,
-                "magnetic_score": 0.99, "raw_score": 1.0 - i / 100,
-                **{name: True for name in ("S1", "S2", "S3", "S4", "S5", "S6", "S8")},
-            }
-        )
-    rows.append(
-        {
-            "formula": "VCl3", "formula_plain": "VCl3", "family": "F4",
-            "magnetic_score": 0.99, "raw_score": 0.5,
-            **{name: True for name in ("S1", "S2", "S3", "S4", "S8")}, "S5": True, "S6": False,
-        }
-    )
-    table = filter_module.select_groups(pd.DataFrame(rows))
+def test_oxidation_states_drop_the_rare_tail(filter_module):
+    pytest.importorskip("smact")
+    assert 1 not in filter_module.oxidation_states("Co")
+    assert {2, 3} <= set(filter_module.oxidation_states("Co"))
+    assert 3 in filter_module.oxidation_states("Mn")
+
+
+def _passing_row(formula, family, cations, raw):
+    return {
+        "formula": formula, "formula_plain": formula, "family": family, "cation_set": cations,
+        "magnetic_score": 0.99, "raw_score": raw,
+        **{name: True for name in ("S1", "S2", "S3", "S4", "S5", "S6", "S8")},
+    }
+
+
+def test_select_groups_caps_each_family_and_cation_set(filter_module):
+    rows = [
+        _passing_row("A", "F1", "Mn+V", 0.99),
+        _passing_row("B", "F1", "Co+Mn", 0.98),
+        _passing_row("C", "F1", "Fe+Mn", 0.97),  # third in F1
+        _passing_row("D", "F2", "Mn+V", 0.96),
+        _passing_row("E", "F3", "Mn+V", 0.95),  # third Mn+V
+        _passing_row("F", "F4", "Cr+Fe", 0.94),
+    ]
+    failing = _passing_row("G", "F5", "Cr+Ni", 0.999)
+    failing["S6"] = False
+    table = filter_module.select_groups(pd.DataFrame(rows + [failing]))
     groups = dict(zip(table["formula"], table["group"]))
-    assert [f for f, g in groups.items() if g == "main"] == ["X0", "X1", "X3", "X4"]
-    assert groups["X2"] == "" and groups["VCl3"] == "reference"
-    assert table.set_index("formula").loc["VCl3", "first_failure"] == "S6"
+    assert [f for f in "ABCDEFG" if groups[f] == "main"] == ["A", "B", "D", "F"]
+    assert table.set_index("formula").loc["G", "first_failure"] == "S6"

@@ -18,6 +18,7 @@ import sys
 import time
 from collections import Counter
 from concurrent.futures import ThreadPoolExecutor
+from functools import lru_cache
 from itertools import permutations, product
 from pathlib import Path
 from typing import Any, Callable, Iterable, Sequence
@@ -37,10 +38,13 @@ DEFAULT_CACHE_DIR = REPO_ROOT / "dft" / "cache"
 SCORE_MIN = 0.98
 MIN_TEMPLATE_COUNT = 20
 FAMILY_LIMIT = 2
+CATION_SET_LIMIT = 2
 MAIN_SIZE = 10
-REFERENCE_EXTRA = 2
 THESIS_TOP = 10
-BENCHMARK = "CrI3"
+REFERENCES = ("CrI3", "VCl3")
+# An oxidation state is allowed when it makes up at least this share of the element's
+# non-zero ICSD (2024) entries; Co+1, for example, is 0.8% of cobalt's.
+OXIDATION_SHARE_MIN = 0.01
 
 # name: (base URL, accepts OR filters, kind). "2d" hits fail S5, "bulk" hits are recorded only.
 OPTIMADE_PROVIDERS: dict[str, tuple[str, bool, str]] = {
@@ -94,10 +98,30 @@ def optimade_anonymous(formula: str) -> str:
     return "".join(f"{letters[i]}{n if n != 1 else ''}" for i, n in enumerate(counts))
 
 
+@lru_cache(maxsize=1)
+def icsd_state_shares() -> dict[str, dict[int, float]]:
+    """Share of each non-zero oxidation state in an element's ICSD (2024) entries, from SMACT data."""
+    import smact
+
+    path = Path(smact.__file__).parent / "data" / "oxidation_states_icsd24_counts.json"
+    totals: Counter = Counter()
+    counts: dict[str, dict[int, int]] = {}
+    for row in json.loads(path.read_text(encoding="utf-8")):
+        state, n = int(row["oxidation_state"]), int(row["results_count"])
+        if state == 0 or n <= 0:
+            continue
+        totals[row["element"]] += n
+        counts.setdefault(row["element"], {})[state] = n
+    return {
+        element: {state: n / totals[element] for state, n in states.items()}
+        for element, states in counts.items()
+    }
+
+
 def oxidation_states(symbol: str) -> tuple[int, ...]:
-    """ICSD oxidation states, or the common ones if pymatgen has no ICSD list."""
-    element = Element(symbol)
-    return tuple(element.icsd_oxidation_states) or tuple(element.common_oxidation_states)
+    """ICSD oxidation states that make up at least OXIDATION_SHARE_MIN of the element's entries."""
+    shares = icsd_state_shares().get(symbol, {})
+    return tuple(sorted(state for state, share in shares.items() if share >= OXIDATION_SHARE_MIN))
 
 
 def charge_assignment(formula: str) -> tuple[bool, bool, dict[str, int] | None]:
@@ -119,6 +143,17 @@ def charge_assignment(formula: str) -> tuple[bool, bool, dict[str, int] | None]:
         if anions and (not cations or max(cations) < min(anions)):
             return True, True, assignment
     return first_neutral is not None, False, first_neutral
+
+
+def cation_set(formula: str, assignment: dict[str, int] | None) -> str:
+    """Cations from the assignment, or every element but the most electronegative one."""
+    if assignment:
+        cations = sorted(symbol for symbol, state in assignment.items() if state > 0)
+        if cations:
+            return "+".join(cations)
+    amounts = integer_amounts(formula)
+    most_negative = max(amounts, key=lambda symbol: Element(symbol).X)
+    return "+".join(sorted(symbol for symbol in amounts if symbol != most_negative))
 
 
 def anion_set(formula: str, assignment: dict[str, int] | None) -> str:
@@ -366,6 +401,7 @@ def local_filters(
                 "optimade_formula": optimade_formula(formula),
                 "anonymous_formula": anonymous,
                 "family": f"{anonymous}:{anion_set(formula, assignment)}",
+                "cation_set": cation_set(formula, assignment),
                 "oxidation_states": " ".join(f"{s}{v:+d}" for s, v in sorted((assignment or {}).items())),
                 "training_template_count": int(templates.get(anonymous, 0)),
                 "S1": record["magnetic_score"] >= SCORE_MIN,
@@ -454,7 +490,7 @@ def first_failure(row: pd.Series) -> str:
 
 
 def select_groups(table: pd.DataFrame) -> pd.DataFrame:
-    """Pick the main 10 with the family cap (S7) and the extra reference candidates."""
+    """Pick the main 10, at most FAMILY_LIMIT per family and CATION_SET_LIMIT per cation set (S7)."""
     table = table.sort_values(
         ["magnetic_score", "raw_score", "formula"], ascending=[False, False, True]
     ).copy()
@@ -462,26 +498,19 @@ def select_groups(table: pd.DataFrame) -> pd.DataFrame:
     table["S7"] = pd.NA
     table["group"] = ""
     per_family: Counter = Counter()
+    per_cations: Counter = Counter()
     main = 0
     for index, row in table.iterrows():
-        if row["first_failure"] != "pass":
+        if row["first_failure"] != "pass" or main >= MAIN_SIZE:
             continue
-        if per_family[row["family"]] >= FAMILY_LIMIT:
+        if per_family[row["family"]] >= FAMILY_LIMIT or per_cations[row["cation_set"]] >= CATION_SET_LIMIT:
             table.at[index, "S7"] = False
             continue
         table.at[index, "S7"] = True
-        if main < MAIN_SIZE:
-            per_family[row["family"]] += 1
-            table.at[index, "group"] = "main"
-            main += 1
-    reference = 0
-    for index, row in table.iterrows():
-        if reference >= REFERENCE_EXTRA:
-            break
-        known_2d = row["first_failure"] in ("S5", "S6")
-        if known_2d and bool(row.get("S8")) and row["formula_plain"] != BENCHMARK:
-            table.at[index, "group"] = "reference"
-            reference += 1
+        per_family[row["family"]] += 1
+        per_cations[row["cation_set"]] += 1
+        table.at[index, "group"] = "main"
+        main += 1
     return table
 
 
@@ -540,7 +569,7 @@ def main(argv: list[str] | None = None) -> int:
     columns = [
         "group", "formula", "formula_plain", "magnetic_score", "raw_score", "first_failure",
         "S1", "S2", "S3", "S4", "S5", "S6", "S7", "S8", "oxidation_states", "anonymous_formula",
-        "family", "training_template_count", "in_c2db",
+        "family", "cation_set", "training_template_count", "in_c2db",
         *[f"db_{name}" for name in OPTIMADE_PROVIDERS], "bulk_known", "prototype_count_2d",
         "literature_hits", "literature_2d_hits", "literature_bulk", "literature_examples",
     ]
@@ -559,7 +588,7 @@ def main(argv: list[str] | None = None) -> int:
         "funnel": funnel,
         "optimade_providers_answered": provider_ok,
         "main": v3.loc[v3["group"] == "main", "formula_plain"].tolist(),
-        "reference": [BENCHMARK, *v3.loc[v3["group"] == "reference", "formula_plain"].tolist()],
+        "reference": list(REFERENCES),
         "thesis_top10_first_failure": dict(zip(thesis_table["formula_plain"], thesis_table["first_failure"])),
     }
     (args.output_dir / "selection.json").write_text(
