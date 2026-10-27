@@ -13,8 +13,9 @@ seen.
 
 ## Filters, in order
 
-Each candidate gets a pass/fail for every filter, and the first filter it fails is recorded. Later filters are
-still evaluated, so the table shows everything.
+Each candidate gets a pass/fail for every filter, and the first filter it fails is recorded. The local filters
+(S1-S4, S8) are evaluated for every candidate. The network filters (S5 and S6) are evaluated for the candidates
+that pass S1-S4, and for the thesis top 10.
 
 | # | Filter | Rule |
 | --- | --- | --- |
