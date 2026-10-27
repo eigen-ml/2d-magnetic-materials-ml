@@ -35,3 +35,8 @@ def train_module() -> ModuleType:
 @pytest.fixture(scope="session")
 def discover_module() -> ModuleType:
     return load_script("04_discover.py")
+
+
+@pytest.fixture(scope="session")
+def filter_module() -> ModuleType:
+    return load_script("06_filter_candidates.py")
