@@ -1,0 +1,146 @@
+{
+  "A_thesislike": {
+    "c2db_band_precision": [
+      {
+        "band": ">=0.98",
+        "magnetic": 69,
+        "precision": 0.9857142857142858,
+        "rows": 70
+      },
+      {
+        "band": "0.95-0.98",
+        "magnetic": 91,
+        "precision": 0.9891304347826086,
+        "rows": 92
+      },
+      {
+        "band": "0.90-0.95",
+        "magnetic": 98,
+        "precision": 0.9514563106796117,
+        "rows": 103
+      },
+      {
+        "band": "0.50-0.90",
+        "magnetic": 259,
+        "precision": 0.6286407766990292,
+        "rows": 412
+      }
+    ],
+    "setup": "any_magnetic target, elements+natoms, C2DB weight 6, raw scores (closest to the thesis setup)",
+    "test_all": {
+      "f1_score": 0.8476964769647697,
+      "precision": 0.7979591836734694,
+      "recall": 0.9040462427745665,
+      "roc_auc": 0.9888511089940925
+    },
+    "test_c2db": {
+      "precision": 0.7897196261682243,
+      "recall": 0.760119940029985,
+      "roc_auc": 0.9222017778989294,
+      "rows": 2647
+    },
+    "test_v2db": {
+      "precision": 0.8002610966057441,
+      "recall": 0.953838174273859,
+      "roc_auc": 0.9966862597100131,
+      "rows": 25171
+    },
+    "threshold": 0.5335634309844344
+  },
+  "B_net_natoms": {
+    "c2db_band_precision": [
+      {
+        "band": ">=0.98",
+        "magnetic": 179,
+        "precision": 0.9835164835164835,
+        "rows": 182
+      },
+      {
+        "band": "0.95-0.98",
+        "magnetic": 71,
+        "precision": 0.8987341772151899,
+        "rows": 79
+      },
+      {
+        "band": "0.90-0.95",
+        "magnetic": 53,
+        "precision": 0.9464285714285714,
+        "rows": 56
+      },
+      {
+        "band": "0.50-0.90",
+        "magnetic": 147,
+        "precision": 0.6504424778761062,
+        "rows": 226
+      }
+    ],
+    "setup": "net_moment target, elements+natoms, C2DB weight 1, isotonic-calibrated",
+    "test_all": {
+      "f1_score": 0.8625267665952892,
+      "precision": 0.851585623678647,
+      "recall": 0.8737527114967462,
+      "roc_auc": 0.9894434118636812
+    },
+    "test_c2db": {
+      "precision": 0.7956448911222781,
+      "recall": 0.7186081694402421,
+      "roc_auc": 0.9047463138166957,
+      "rows": 2604
+    },
+    "test_v2db": {
+      "precision": 0.870475113122172,
+      "recall": 0.9361313868613139,
+      "roc_auc": 0.9976822324893635,
+      "rows": 25266
+    },
+    "threshold": 0.44144144144144143
+  },
+  "C_net_elements": {
+    "c2db_band_precision": [
+      {
+        "band": ">=0.98",
+        "magnetic": 187,
+        "precision": 0.9689119170984456,
+        "rows": 193
+      },
+      {
+        "band": "0.95-0.98",
+        "magnetic": 0,
+        "precision": null,
+        "rows": 0
+      },
+      {
+        "band": "0.90-0.95",
+        "magnetic": 49,
+        "precision": 0.9074074074074074,
+        "rows": 54
+      },
+      {
+        "band": "0.50-0.90",
+        "magnetic": 158,
+        "precision": 0.7348837209302326,
+        "rows": 215
+      }
+    ],
+    "setup": "net_moment target, elements only, C2DB weight 1, isotonic-calibrated (models/v3)",
+    "test_all": {
+      "f1_score": 0.8476277372262774,
+      "precision": 0.8936988936988937,
+      "recall": 0.8060737527114967,
+      "roc_auc": 0.9866628851725409
+    },
+    "test_c2db": {
+      "precision": 0.8528138528138528,
+      "recall": 0.5960665658093798,
+      "roc_auc": 0.8929050558153984,
+      "rows": 2604
+    },
+    "test_v2db": {
+      "precision": 0.9053803339517625,
+      "recall": 0.8905109489051095,
+      "roc_auc": 0.9971285505223079,
+      "rows": 25266
+    },
+    "threshold": 0.6666666666666666
+  }
+}
