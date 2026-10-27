@@ -40,3 +40,4 @@ slurm-*.out
 /results/*.csv.gz
 /results/screened_candidates.csv
 /data/v3/
+/models/v3_experiments/

@@ -200,6 +200,20 @@ def positive_class_index(classifier: Any) -> int:
     return classes.index(1)
 
 
+def raw_scores(classifier: Any, X: pd.DataFrame) -> np.ndarray:
+    """Return the uncalibrated positive-class score.
+
+    Isotonic calibration maps many top scores to the same value, so ties are
+    broken by the score of the underlying boosted trees.
+    """
+    calibrated = getattr(classifier, "calibrated_classifiers_", None)
+    if not calibrated:
+        return np.asarray(classifier.predict_proba(X))[:, positive_class_index(classifier)]
+    base = calibrated[0].estimator
+    base = getattr(base, "estimator", base)  # unwrap FrozenEstimator
+    return np.asarray(base.predict_proba(X))[:, positive_class_index(base)]
+
+
 def normalize_candidates(candidates: Iterable[str]) -> tuple[list[str], int]:
     """Normalize and deduplicate candidates, returning invalid-input count."""
     normalized: set[str] = set()
@@ -254,19 +268,23 @@ def main(argv: list[str] | None = None) -> int:
         X = pd.DataFrame(feature_rows, columns=feature_names)
         class_index = positive_class_index(classifier)
         scores = np.asarray(classifier.predict_proba(X))[:, class_index]
+        uncalibrated = raw_scores(classifier, X)
         selected = [
             {
                 "formula": formula,
                 "magnetic_score": float(score),
+                "raw_score": float(raw),
                 "score_band": score_band(float(score)),
             }
-            for formula, score in zip(valid_formulas, scores)
+            for formula, score, raw in zip(valid_formulas, scores, uncalibrated)
             if score >= threshold
         ]
         results = pd.DataFrame(
-            selected, columns=["formula", "magnetic_score", "score_band"]
+            selected, columns=["formula", "magnetic_score", "raw_score", "score_band"]
         ).sort_values(
-            ["magnetic_score", "formula"], ascending=[False, True], ignore_index=True
+            ["magnetic_score", "raw_score", "formula"],
+            ascending=[False, False, True],
+            ignore_index=True,
         )
     except (
         FileNotFoundError,

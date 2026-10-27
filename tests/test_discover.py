@@ -51,3 +51,19 @@ def test_discovery_cli_reports_missing_model(discover_module, tmp_path, capsys):
     )
     assert exit_code == 2
     assert "missing model artefact" in capsys.readouterr().err
+
+
+def test_raw_scores_unwrap_a_calibrated_model(discover_module, train_module):
+    import numpy as np
+    import pandas as pd
+
+    rng = np.random.default_rng(1)
+    X = pd.DataFrame({"x": rng.normal(size=300)})
+    y = pd.Series((X["x"] > 0).astype(int))
+    classifier, _ = train_module.train_model(X, y, n_estimators=10)
+    calibrated = train_module.calibrate(classifier, X, y)
+
+    raw = discover_module.raw_scores(calibrated, X)
+
+    assert np.allclose(raw, classifier.predict_proba(X)[:, 1])
+    assert np.allclose(discover_module.raw_scores(classifier, X), raw)
