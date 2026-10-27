@@ -4,3 +4,11 @@ services:
     ports:
       - "8000:8000"
     restart: unless-stopped
+
+  research:
+    build:
+      context: .
+      dockerfile: Dockerfile.research
+    volumes:
+      - .:/work
+    profiles: ["research"]
