@@ -8,6 +8,12 @@ def test_candidate_generation_is_sorted_and_unique(discover_module):
     assert "FeMnO3" in candidates
 
 
+def test_unequal_metal_ratios_are_generated_both_ways(discover_module):
+    candidates = discover_module.generate_candidates(["Mn", "Cr"], ["Br"], ["Mo"])
+    assert {"Mn2CrBr4", "Cr2MnBr4"} <= set(candidates)
+    assert {"MnMo2Br4", "Mn2MoBr4"} <= set(candidates)
+
+
 def test_formula_normalization_and_feature_schema(discover_module):
     assert discover_module.normalize_formula("Fe4O6") == "Fe2O3"
     features = discover_module.featurize(
@@ -23,7 +29,8 @@ def test_formula_normalization_and_feature_schema(discover_module):
 
 
 def test_score_bands_are_descriptive(discover_module):
-    assert discover_module.score_band(0.96) == "0.95-1.00"
+    assert discover_module.score_band(0.99) == "0.98-1.00"
+    assert discover_module.score_band(0.96) == "0.95-0.98"
     assert discover_module.score_band(0.91) == "0.90-0.95"
     assert discover_module.score_band(0.85) == "0.80-0.90"
     assert discover_module.score_band(0.60) == "threshold-0.80"
@@ -44,3 +51,19 @@ def test_discovery_cli_reports_missing_model(discover_module, tmp_path, capsys):
     )
     assert exit_code == 2
     assert "missing model artefact" in capsys.readouterr().err
+
+
+def test_raw_scores_unwrap_a_calibrated_model(discover_module, train_module):
+    import numpy as np
+    import pandas as pd
+
+    rng = np.random.default_rng(1)
+    X = pd.DataFrame({"x": rng.normal(size=300)})
+    y = pd.Series((X["x"] > 0).astype(int))
+    classifier, _ = train_module.train_model(X, y, n_estimators=10)
+    calibrated = train_module.calibrate(classifier, X, y)
+
+    raw = discover_module.raw_scores(calibrated, X)
+
+    assert np.allclose(raw, classifier.predict_proba(X)[:, 1])
+    assert np.allclose(discover_module.raw_scores(classifier, X), raw)

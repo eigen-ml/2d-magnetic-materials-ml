@@ -55,3 +55,42 @@ def test_train_cli_reports_missing_prepared_data(train_module, tmp_path, capsys)
     exit_code = train_module.main(["--data", str(tmp_path / "missing.csv")])
     assert exit_code == 2
     assert "prepared dataset not found" in capsys.readouterr().err
+
+
+def test_elements_feature_set_drops_natoms(train_module):
+    frame = pd.DataFrame({"formula_normalized": ["MnO", "Fe2O3"], "is_magnetic": [1, 0]})
+    features, _ = train_module.featurize_dataset(frame)
+    assert "natoms" not in train_module.select_features(features, "elements").columns
+    assert "natoms" in train_module.select_features(features, "elements+natoms").columns
+
+
+def test_band_precision_counts_each_band_once(train_module):
+    bands = train_module.band_precision(
+        np.array([1, 1, 0, 1, 0]),
+        np.array([0.99, 0.985, 0.96, 0.91, 0.20]),
+        edges=(0.98, 0.95, 0.90),
+    )
+    assert [band["rows"] for band in bands] == [2, 1, 1]
+    assert [band["precision"] for band in bands] == [1.0, 0.0, 1.0]
+
+
+def test_evaluate_by_source_skips_single_class_sources(train_module):
+    results = train_module.evaluate_by_source(
+        pd.Series([1, 0, 1, 1]),
+        np.array([1, 0, 1, 0]),
+        np.array([0.9, 0.1, 0.8, 0.4]),
+        pd.Series(["V2DB", "V2DB", "C2DB", "C2DB"]),
+    )
+    assert results["V2DB"]["roc_auc"] == 1.0
+    assert "note" in results["C2DB"]
+
+
+def test_calibrated_scores_stay_in_unit_interval(train_module):
+    rng = np.random.default_rng(0)
+    X = pd.DataFrame({"x": rng.normal(size=400)})
+    y = pd.Series((X["x"] + rng.normal(scale=0.5, size=400) > 0).astype(int))
+    classifier, _ = train_module.train_model(X, y, n_estimators=10)
+    calibrated = train_module.calibrate(classifier, X, y)
+    scores = calibrated.predict_proba(X)[:, 1]
+    assert scores.min() >= 0.0 and scores.max() <= 1.0
+    assert list(calibrated.classes_) == [0, 1]

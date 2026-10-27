@@ -39,3 +39,5 @@ slurm-*.out
 /data/known_materials.txt
 /results/*.csv.gz
 /results/screened_candidates.csv
+/data/v3/
+/models/v3_experiments/

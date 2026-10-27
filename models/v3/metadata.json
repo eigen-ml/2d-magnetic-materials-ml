@@ -1,0 +1,302 @@
+{
+  "data": {
+    "class_distribution": {
+      "magnetic": 11525,
+      "non_magnetic": 127822
+    },
+    "rows_featurized": 139347,
+    "rows_read": 139347,
+    "sha256": "04c4d5f4ecd65926750818d4fa505eafe40805e22df6990b038d3fef29081a34"
+  },
+  "feature_names": [
+    "elem_Ag",
+    "elem_Al",
+    "elem_As",
+    "elem_Au",
+    "elem_B",
+    "elem_Ba",
+    "elem_Be",
+    "elem_Bi",
+    "elem_Br",
+    "elem_C",
+    "elem_Ca",
+    "elem_Cd",
+    "elem_Cl",
+    "elem_Co",
+    "elem_Cr",
+    "elem_Cs",
+    "elem_Cu",
+    "elem_F",
+    "elem_Fe",
+    "elem_Ga",
+    "elem_Ge",
+    "elem_H",
+    "elem_Hf",
+    "elem_Hg",
+    "elem_I",
+    "elem_In",
+    "elem_Ir",
+    "elem_K",
+    "elem_Li",
+    "elem_Mg",
+    "elem_Mn",
+    "elem_Mo",
+    "elem_N",
+    "elem_Na",
+    "elem_Nb",
+    "elem_Ni",
+    "elem_O",
+    "elem_Os",
+    "elem_P",
+    "elem_Pb",
+    "elem_Pd",
+    "elem_Pt",
+    "elem_Rb",
+    "elem_Re",
+    "elem_Rh",
+    "elem_Ru",
+    "elem_S",
+    "elem_Sb",
+    "elem_Sc",
+    "elem_Se",
+    "elem_Si",
+    "elem_Sn",
+    "elem_Sr",
+    "elem_Ta",
+    "elem_Te",
+    "elem_Ti",
+    "elem_Tl",
+    "elem_V",
+    "elem_W",
+    "elem_Xe",
+    "elem_Y",
+    "elem_Zn",
+    "elem_Zr"
+  ],
+  "feature_set": "elements",
+  "model": {
+    "class": "sklearn.ensemble.GradientBoostingClassifier",
+    "parameters": {
+      "ccp_alpha": 0.0,
+      "criterion": "friedman_mse",
+      "init": null,
+      "learning_rate": 0.06,
+      "loss": "log_loss",
+      "max_depth": 8,
+      "max_features": "sqrt",
+      "max_leaf_nodes": null,
+      "min_impurity_decrease": 0.0,
+      "min_samples_leaf": 2,
+      "min_samples_split": 4,
+      "min_weight_fraction_leaf": 0.0,
+      "n_estimators": 300,
+      "n_iter_no_change": null,
+      "random_state": 42,
+      "subsample": 0.85,
+      "tol": 0.0001,
+      "validation_fraction": 0.1,
+      "verbose": 0,
+      "warm_start": false
+    },
+    "weighting": {
+      "c2db_weight": 1.0,
+      "class_weight_factor": 0.35,
+      "magnetic_sample_weight": 3.8817448481561816
+    }
+  },
+  "model_version": "v3.1_composition_only",
+  "n_features": 63,
+  "natoms_seen_by_source": {
+    "C2DB": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      23,
+      25,
+      27,
+      31,
+      33,
+      37,
+      41,
+      49,
+      51
+    ],
+    "V2DB": [
+      2,
+      3,
+      4,
+      6
+    ]
+  },
+  "schema_version": 1,
+  "scientific_scope": {
+    "calibration": "isotonic, fitted on the validation split",
+    "input": "reduced chemical composition only",
+    "scores_calibrated": true,
+    "structural_features_used": false,
+    "target": "is_magnetic column of combined_net_moment.csv"
+  },
+  "software_versions": {
+    "joblib": "1.6.0",
+    "numpy": "2.5.4",
+    "pandas": "2.3.3",
+    "pymatgen": "2026.10.24",
+    "python": "3.12.16",
+    "scikit-learn": "1.7.2"
+  },
+  "split": {
+    "random_state": 42,
+    "test_rows": 27870,
+    "train_rows": 89181,
+    "validation_rows": 22296
+  },
+  "test_metrics": {
+    "accuracy": 0.9760315751704342,
+    "band_precision": [
+      {
+        "band": ">=0.98",
+        "magnetic": 1036,
+        "precision": 0.9885496183206107,
+        "rows": 1048
+      },
+      {
+        "band": "0.95-0.98",
+        "magnetic": 0,
+        "precision": null,
+        "rows": 0
+      },
+      {
+        "band": "0.90-0.95",
+        "magnetic": 221,
+        "precision": 0.9444444444444444,
+        "rows": 234
+      },
+      {
+        "band": "0.50-0.90",
+        "magnetic": 601,
+        "precision": 0.7540777917189461,
+        "rows": 797
+      }
+    ],
+    "confusion_matrix": {
+      "fn": 447,
+      "fp": 221,
+      "tn": 25344,
+      "tp": 1858
+    },
+    "f1_score": 0.8476277372262774,
+    "precision": 0.8936988936988937,
+    "recall": 0.8060737527114967,
+    "roc_auc": 0.9866628851725409
+  },
+  "test_metrics_by_source": {
+    "C2DB": {
+      "accuracy": 0.8713517665130568,
+      "band_precision": [
+        {
+          "band": ">=0.98",
+          "magnetic": 187,
+          "precision": 0.9689119170984456,
+          "rows": 193
+        },
+        {
+          "band": "0.95-0.98",
+          "magnetic": 0,
+          "precision": null,
+          "rows": 0
+        },
+        {
+          "band": "0.90-0.95",
+          "magnetic": 49,
+          "precision": 0.9074074074074074,
+          "rows": 54
+        },
+        {
+          "band": "0.50-0.90",
+          "magnetic": 158,
+          "precision": 0.7348837209302326,
+          "rows": 215
+        }
+      ],
+      "confusion_matrix": {
+        "fn": 267,
+        "fp": 68,
+        "tn": 1875,
+        "tp": 394
+      },
+      "f1_score": 0.7016918967052538,
+      "precision": 0.8528138528138528,
+      "recall": 0.5960665658093798,
+      "roc_auc": 0.8929050558153984,
+      "rows": 2604
+    },
+    "V2DB": {
+      "accuracy": 0.9868202327238186,
+      "band_precision": [
+        {
+          "band": ">=0.98",
+          "magnetic": 849,
+          "precision": 0.9929824561403509,
+          "rows": 855
+        },
+        {
+          "band": "0.95-0.98",
+          "magnetic": 0,
+          "precision": null,
+          "rows": 0
+        },
+        {
+          "band": "0.90-0.95",
+          "magnetic": 172,
+          "precision": 0.9555555555555556,
+          "rows": 180
+        },
+        {
+          "band": "0.50-0.90",
+          "magnetic": 443,
+          "precision": 0.761168384879725,
+          "rows": 582
+        }
+      ],
+      "confusion_matrix": {
+        "fn": 180,
+        "fp": 153,
+        "tn": 23469,
+        "tp": 1464
+      },
+      "f1_score": 0.8978840846366145,
+      "precision": 0.9053803339517625,
+      "recall": 0.8905109489051095,
+      "roc_auc": 0.9971285505223079,
+      "rows": 25266
+    }
+  },
+  "threshold": 0.6666666666666666,
+  "threshold_selection": {
+    "constraint_status": "not_met_fallback_to_max_f1",
+    "minimum_precision": 0.8,
+    "selected_on": "validation_split",
+    "target_recall": 0.9,
+    "validation_f1": 0.8512968299711815,
+    "validation_precision": 0.9083640836408364,
+    "validation_recall": 0.8009761388286334
+  }
+}

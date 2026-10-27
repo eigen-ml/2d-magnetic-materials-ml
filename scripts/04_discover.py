@@ -6,7 +6,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
-from itertools import combinations, product
+from itertools import combinations, permutations, product
 from pathlib import Path
 from typing import Any, Iterable, Sequence
 
@@ -94,7 +94,12 @@ def generate_candidates(
     anions: Sequence[str],
     other_metals: Sequence[str] | None = None,
 ) -> list[str]:
-    """Enumerate the project's rule-based composition search space deterministically."""
+    """Enumerate the project's rule-based composition search space deterministically.
+
+    Templates with an unequal metal ratio (A2BX4, AB2X4) are generated for both
+    orderings of the metals. The thesis used ordered pairs only, so it produced
+    Mn2CrX4 but never Cr2MnX4, which biased the shortlist towards Mn.
+    """
     candidates: set[str] = set()
 
     for metal, anion in product(magnetic_metals, anions):
@@ -114,9 +119,12 @@ def generate_candidates(
             {
                 f"{first_metal}{second_metal}{anion}3",
                 f"{first_metal}{second_metal}{anion}4",
-                f"{first_metal}2{second_metal}{anion}4",
             }
         )
+    for (first_metal, second_metal), anion in product(
+        permutations(magnetic_metals, 2), anions
+    ):
+        candidates.add(f"{first_metal}2{second_metal}{anion}4")
 
     if other_metals:
         for metal, other_metal, anion in product(
@@ -126,6 +134,7 @@ def generate_candidates(
                 {
                     f"{metal}{other_metal}{anion}3",
                     f"{metal}{other_metal}2{anion}4",
+                    f"{metal}2{other_metal}{anion}4",
                 }
             )
 
@@ -171,9 +180,11 @@ def featurize(formula: str, feature_names: Sequence[str]) -> dict[str, float] | 
 
 
 def score_band(score: float) -> str:
-    """Return a descriptive score band; this is not calibrated confidence."""
+    """Return a descriptive score band (calibrated only if the model says so)."""
+    if score >= 0.98:
+        return "0.98-1.00"
     if score >= 0.95:
-        return "0.95-1.00"
+        return "0.95-0.98"
     if score >= 0.90:
         return "0.90-0.95"
     if score >= 0.80:
@@ -187,6 +198,20 @@ def positive_class_index(classifier: Any) -> int:
     if 1 not in classes:
         raise ScreeningError("the loaded classifier does not expose binary class 1")
     return classes.index(1)
+
+
+def raw_scores(classifier: Any, X: pd.DataFrame) -> np.ndarray:
+    """Return the uncalibrated positive-class score.
+
+    Isotonic calibration maps many top scores to the same value, so ties are
+    broken by the score of the underlying boosted trees.
+    """
+    calibrated = getattr(classifier, "calibrated_classifiers_", None)
+    if not calibrated:
+        return np.asarray(classifier.predict_proba(X))[:, positive_class_index(classifier)]
+    base = calibrated[0].estimator
+    base = getattr(base, "estimator", base)  # unwrap FrozenEstimator
+    return np.asarray(base.predict_proba(X))[:, positive_class_index(base)]
 
 
 def normalize_candidates(candidates: Iterable[str]) -> tuple[list[str], int]:
@@ -243,19 +268,23 @@ def main(argv: list[str] | None = None) -> int:
         X = pd.DataFrame(feature_rows, columns=feature_names)
         class_index = positive_class_index(classifier)
         scores = np.asarray(classifier.predict_proba(X))[:, class_index]
+        uncalibrated = raw_scores(classifier, X)
         selected = [
             {
                 "formula": formula,
                 "magnetic_score": float(score),
+                "raw_score": float(raw),
                 "score_band": score_band(float(score)),
             }
-            for formula, score in zip(valid_formulas, scores)
+            for formula, score, raw in zip(valid_formulas, scores, uncalibrated)
             if score >= threshold
         ]
         results = pd.DataFrame(
-            selected, columns=["formula", "magnetic_score", "score_band"]
+            selected, columns=["formula", "magnetic_score", "raw_score", "score_band"]
         ).sort_values(
-            ["magnetic_score", "formula"], ascending=[False, True], ignore_index=True
+            ["magnetic_score", "raw_score", "formula"],
+            ascending=[False, False, True],
+            ignore_index=True,
         )
     except (
         FileNotFoundError,
@@ -315,7 +344,10 @@ def main(argv: list[str] | None = None) -> int:
     print(f"Unsupported compositions skipped: {len(unseen) - len(valid_formulas):,}")
     print(f"Unseen compositions scored: {len(valid_formulas):,}")
     print(f"Selected at threshold {threshold:.4f}: {len(results):,}")
-    print("Scores are not calibrated probabilities or evidence of physical stability.")
+    if summary["scores_calibrated"]:
+        print("Scores are calibrated on the validation split; they are not evidence of stability.")
+    else:
+        print("Scores are not calibrated probabilities or evidence of physical stability.")
     print(f"Wrote: {results_path}")
     print(f"Wrote: {shortlist_path}")
     print(f"Wrote: {summary_path}")

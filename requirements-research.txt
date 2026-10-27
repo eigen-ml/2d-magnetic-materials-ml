@@ -1,0 +1,4 @@
+-r requirements-api.txt
+# Revision (v3) and DFT-validation work: composition features, external 2D databases
+matminer>=0.9,<1
+jarvis-tools>=2024.5
