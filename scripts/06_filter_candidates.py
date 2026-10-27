@@ -551,10 +551,10 @@ def main(argv: list[str] | None = None) -> int:
     funnel = {"screened": int(len(v3))}
     alive = pd.Series(True, index=v3.index)
     for name in ("S1", "S2", "S3", "S4", "S5", "S6", "S8"):
-        alive &= v3[name].fillna(False).astype(bool)
+        alive &= v3[name].astype("boolean").fillna(False).astype(bool)
         funnel[f"after_{name}"] = int(alive.sum())
     summary = {
-        "run_date": dt.date.today().isoformat(),
+        "run_date_utc": dt.datetime.now(dt.timezone.utc).date().isoformat(),
         "criteria": "dft/CRITERIA.md",
         "funnel": funnel,
         "optimade_providers_answered": provider_ok,
