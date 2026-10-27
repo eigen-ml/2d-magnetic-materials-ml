@@ -6,7 +6,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
-from itertools import combinations, product
+from itertools import combinations, permutations, product
 from pathlib import Path
 from typing import Any, Iterable, Sequence
 
@@ -94,7 +94,12 @@ def generate_candidates(
     anions: Sequence[str],
     other_metals: Sequence[str] | None = None,
 ) -> list[str]:
-    """Enumerate the project's rule-based composition search space deterministically."""
+    """Enumerate the project's rule-based composition search space deterministically.
+
+    Templates with an unequal metal ratio (A2BX4, AB2X4) are generated for both
+    orderings of the metals. The thesis used ordered pairs only, so it produced
+    Mn2CrX4 but never Cr2MnX4, which biased the shortlist towards Mn.
+    """
     candidates: set[str] = set()
 
     for metal, anion in product(magnetic_metals, anions):
@@ -114,9 +119,12 @@ def generate_candidates(
             {
                 f"{first_metal}{second_metal}{anion}3",
                 f"{first_metal}{second_metal}{anion}4",
-                f"{first_metal}2{second_metal}{anion}4",
             }
         )
+    for (first_metal, second_metal), anion in product(
+        permutations(magnetic_metals, 2), anions
+    ):
+        candidates.add(f"{first_metal}2{second_metal}{anion}4")
 
     if other_metals:
         for metal, other_metal, anion in product(
@@ -126,6 +134,7 @@ def generate_candidates(
                 {
                     f"{metal}{other_metal}{anion}3",
                     f"{metal}{other_metal}2{anion}4",
+                    f"{metal}2{other_metal}{anion}4",
                 }
             )
 
@@ -171,9 +180,11 @@ def featurize(formula: str, feature_names: Sequence[str]) -> dict[str, float] | 
 
 
 def score_band(score: float) -> str:
-    """Return a descriptive score band; this is not calibrated confidence."""
+    """Return a descriptive score band (calibrated only if the model says so)."""
+    if score >= 0.98:
+        return "0.98-1.00"
     if score >= 0.95:
-        return "0.95-1.00"
+        return "0.95-0.98"
     if score >= 0.90:
         return "0.90-0.95"
     if score >= 0.80:
@@ -315,7 +326,10 @@ def main(argv: list[str] | None = None) -> int:
     print(f"Unsupported compositions skipped: {len(unseen) - len(valid_formulas):,}")
     print(f"Unseen compositions scored: {len(valid_formulas):,}")
     print(f"Selected at threshold {threshold:.4f}: {len(results):,}")
-    print("Scores are not calibrated probabilities or evidence of physical stability.")
+    if summary["scores_calibrated"]:
+        print("Scores are calibrated on the validation split; they are not evidence of stability.")
+    else:
+        print("Scores are not calibrated probabilities or evidence of physical stability.")
     print(f"Wrote: {results_path}")
     print(f"Wrote: {shortlist_path}")
     print(f"Wrote: {summary_path}")
