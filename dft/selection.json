@@ -1,0 +1,50 @@
+{
+  "criteria": "dft/CRITERIA.md",
+  "funnel": {
+    "after_S1": 759,
+    "after_S2": 759,
+    "after_S3": 372,
+    "after_S4": 364,
+    "after_S5": 361,
+    "after_S6": 350,
+    "after_S8": 350,
+    "after_S9": 208,
+    "screened": 1577
+  },
+  "main": [
+    "Mn2VSe4",
+    "Mn2VS4",
+    "Mn2CoSe4",
+    "Mn2CoTe4",
+    "Mn2CrS4",
+    "Mn2CrTe4",
+    "MnFeS3",
+    "MnBr2Cl",
+    "MnBrCl2",
+    "CrCoSe3"
+  ],
+  "optimade_providers_answered": {
+    "alexandria": true,
+    "jarvis": true,
+    "mc2d": true,
+    "mp": true,
+    "twodmatpedia": true
+  },
+  "reference": [
+    "CrI3",
+    "VCl3"
+  ],
+  "run_date_utc": "2026-10-28",
+  "thesis_top10_first_failure": {
+    "Fe2CoCl4": "S3",
+    "Mn2CoCl4": "S3",
+    "Mn2CrBr4": "S3",
+    "Mn2CrCl4": "S3",
+    "Mn2CrF4": "S3",
+    "Mn2CrI4": "S3",
+    "Mn2CrO4": "pass",
+    "Mn2FeCl4": "S3",
+    "Mn2FeI4": "S3",
+    "Mn2FeO4": "S6"
+  }
+}
