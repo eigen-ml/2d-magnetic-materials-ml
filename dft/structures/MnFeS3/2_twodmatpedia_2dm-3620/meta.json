@@ -1,0 +1,44 @@
+{
+  "anonymous": "A3BC",
+  "candidate_ox": {
+    "Fe": 3,
+    "Mn": 3,
+    "S": -2
+  },
+  "citation": "Zhou et al., Sci. Data 6, 86 (2019)",
+  "formula": "MnFeS3",
+  "group": "main",
+  "id": "2dm-3620",
+  "licence": "CC BY 4.0",
+  "mace_a_b_A": [
+    3.112,
+    7.947
+  ],
+  "mace_converged": true,
+  "mace_energy_eV_per_atom": -6.42432,
+  "mace_min_distance_A": 2.074,
+  "mace_model": "MACE-MP-0 medium",
+  "mace_steps": 34,
+  "mace_thickness_A": 4.593,
+  "mapping": {
+    "In": "Mn",
+    "S": "S",
+    "Sb": "Fe"
+  },
+  "min_distance_A": 2.37,
+  "note": "Unrelaxed starting structure; needs MLIP pre-relax and a VESTA check.",
+  "nsites": 10,
+  "prototype_formula": "InS3Sb",
+  "prototype_ox": {
+    "In": 3,
+    "S": -2,
+    "Sb": 3
+  },
+  "rank": 2,
+  "score": 0.2926713947990543,
+  "source": "twodmatpedia",
+  "spacegroup_symprec0.1": "P2_1/m (11)",
+  "start_thickness_A": 5.431,
+  "thickness_A": 5.431,
+  "vacuum_A": 20.0
+}

@@ -1,0 +1,44 @@
+{
+  "anonymous": "A4B2C",
+  "candidate_ox": {
+    "Mn": 2,
+    "S": -2,
+    "V": 4
+  },
+  "citation": "Zhou et al., Sci. Data 6, 86 (2019)",
+  "formula": "Mn2VS4",
+  "group": "main",
+  "id": "2dm-4450",
+  "licence": "CC BY 4.0",
+  "mace_a_b_A": [
+    3.706,
+    6.055
+  ],
+  "mace_converged": true,
+  "mace_energy_eV_per_atom": -6.88294,
+  "mace_min_distance_A": 2.206,
+  "mace_model": "MACE-MP-0 medium",
+  "mace_steps": 26,
+  "mace_thickness_A": 3.089,
+  "mapping": {
+    "Fe": "Mn",
+    "Se": "S",
+    "Ti": "V"
+  },
+  "min_distance_A": 2.204,
+  "note": "Unrelaxed starting structure; needs MLIP pre-relax and a VESTA check.",
+  "nsites": 7,
+  "prototype_formula": "Fe2Se4Ti",
+  "prototype_ox": {
+    "Fe": 2,
+    "Se": -2,
+    "Ti": 4
+  },
+  "rank": 2,
+  "score": 0.16399182958856143,
+  "source": "twodmatpedia",
+  "spacegroup_symprec0.1": "P-1 (2)",
+  "start_thickness_A": 3.175,
+  "thickness_A": 3.175,
+  "vacuum_A": 20.0
+}

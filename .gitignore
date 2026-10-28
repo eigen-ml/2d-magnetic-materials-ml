@@ -42,3 +42,4 @@ slurm-*.out
 /data/v3/
 /models/v3_experiments/
 /dft/cache/
+.venv-mlip/

@@ -1,0 +1,44 @@
+{
+  "anonymous": "A4B2C",
+  "candidate_ox": {
+    "Cr": 2,
+    "Mn": 3,
+    "S": -2
+  },
+  "citation": "Campi et al., ACS Nano 17, 11268 (2023); Mounet et al., Nat. Nanotechnol. 13, 246 (2018)",
+  "formula": "Mn2CrS4",
+  "group": "main",
+  "id": "cbfbaf2f-2414-459b-b516-7b8c5516748d",
+  "licence": "CC BY 4.0",
+  "mace_a_b_A": [
+    3.697,
+    3.697
+  ],
+  "mace_converged": true,
+  "mace_energy_eV_per_atom": -6.81781,
+  "mace_min_distance_A": 2.263,
+  "mace_model": "MACE-MP-0 medium",
+  "mace_steps": 15,
+  "mace_thickness_A": 8.97,
+  "mapping": {
+    "Ga": "Mn",
+    "Mn": "Cr",
+    "S": "S"
+  },
+  "min_distance_A": 2.182,
+  "note": "Unrelaxed starting structure; needs MLIP pre-relax and a VESTA check.",
+  "nsites": 7,
+  "prototype_formula": "Ga2MnS4",
+  "prototype_ox": {
+    "Ga": 3,
+    "Mn": 2,
+    "S": -2
+  },
+  "rank": 2,
+  "score": 0.0638225718936517,
+  "source": "mc2d",
+  "spacegroup_symprec0.1": "P3m1 (156)",
+  "start_thickness_A": 8.855,
+  "thickness_A": 8.855,
+  "vacuum_A": 20.0
+}

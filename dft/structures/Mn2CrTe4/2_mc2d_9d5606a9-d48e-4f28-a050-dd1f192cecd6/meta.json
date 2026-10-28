@@ -1,0 +1,44 @@
+{
+  "anonymous": "A4B2C",
+  "candidate_ox": {
+    "Cr": 2,
+    "Mn": 3,
+    "Te": -2
+  },
+  "citation": "Campi et al., ACS Nano 17, 11268 (2023); Mounet et al., Nat. Nanotechnol. 13, 246 (2018)",
+  "formula": "Mn2CrTe4",
+  "group": "main",
+  "id": "9d5606a9-d48e-4f28-a050-dd1f192cecd6",
+  "licence": "CC BY 4.0",
+  "mace_a_b_A": [
+    6.191,
+    7.638
+  ],
+  "mace_converged": true,
+  "mace_energy_eV_per_atom": -5.86105,
+  "mace_min_distance_A": 2.626,
+  "mace_model": "MACE-MP-0 medium",
+  "mace_steps": 20,
+  "mace_thickness_A": 3.574,
+  "mapping": {
+    "Ge": "Cr",
+    "Nb": "Mn",
+    "Te": "Te"
+  },
+  "min_distance_A": 2.786,
+  "note": "Unrelaxed starting structure; needs MLIP pre-relax and a VESTA check.",
+  "nsites": 14,
+  "prototype_formula": "GeNb2Te4",
+  "prototype_ox": {
+    "Ge": 2,
+    "Nb": 3,
+    "Te": -2
+  },
+  "rank": 2,
+  "score": 0.16766907244052381,
+  "source": "mc2d",
+  "spacegroup_symprec0.1": "Pbam (55)",
+  "start_thickness_A": 3.778,
+  "thickness_A": 3.778,
+  "vacuum_A": 20.0
+}

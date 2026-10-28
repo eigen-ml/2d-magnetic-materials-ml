@@ -1,0 +1,44 @@
+{
+  "anonymous": "A4B2C",
+  "candidate_ox": {
+    "Co": 2,
+    "Mn": 3,
+    "Te": -2
+  },
+  "citation": "Zhou et al., Sci. Data 6, 86 (2019)",
+  "formula": "Mn2CoTe4",
+  "group": "main",
+  "id": "2dm-3039",
+  "licence": "CC BY 4.0",
+  "mace_a_b_A": [
+    4.033,
+    4.033
+  ],
+  "mace_converged": true,
+  "mace_energy_eV_per_atom": -5.42879,
+  "mace_min_distance_A": 2.405,
+  "mace_model": "MACE-MP-0 medium",
+  "mace_steps": 18,
+  "mace_thickness_A": 10.252,
+  "mapping": {
+    "Ga": "Mn",
+    "S": "Te",
+    "Zn": "Co"
+  },
+  "min_distance_A": 2.603,
+  "note": "Unrelaxed starting structure; needs MLIP pre-relax and a VESTA check.",
+  "nsites": 7,
+  "prototype_formula": "Ga2S4Zn",
+  "prototype_ox": {
+    "Ga": 3,
+    "S": -2,
+    "Zn": 2
+  },
+  "rank": 3,
+  "score": 0.25622361384745285,
+  "source": "twodmatpedia",
+  "spacegroup_symprec0.1": "P3m1 (156)",
+  "start_thickness_A": 10.637,
+  "thickness_A": 10.637,
+  "vacuum_A": 20.0
+}

@@ -1,0 +1,43 @@
+{
+  "anonymous": "A2BC",
+  "candidate_ox": {
+    "Br": -1,
+    "Mn": 3
+  },
+  "citation": "Zhou et al., Sci. Data 6, 86 (2019)",
+  "formula": "MnBr2Cl",
+  "group": "main",
+  "id": "2dm-1474-o1",
+  "licence": "CC BY 4.0",
+  "mace_a_b_A": [
+    6.479,
+    6.479
+  ],
+  "mace_converged": true,
+  "mace_energy_eV_per_atom": -4.35722,
+  "mace_min_distance_A": 2.35,
+  "mace_model": "MACE-MP-0 medium",
+  "mace_steps": 22,
+  "mace_thickness_A": 2.886,
+  "mapping": {
+    "Br": "Br",
+    "Mn": "Mn"
+  },
+  "min_distance_A": 2.442,
+  "note": "Unrelaxed starting structure; needs MLIP pre-relax and a VESTA check.",
+  "nsites": 8,
+  "ordering_degeneracy": 6,
+  "parent_formula": "MnBr3",
+  "prototype_formula": "Br3Mn",
+  "prototype_ox": {
+    "Br": -1,
+    "Mn": 3
+  },
+  "rank": 3,
+  "score": 0.0,
+  "source": "twodmatpedia-ordered",
+  "spacegroup_symprec0.1": "Cm (8)",
+  "start_thickness_A": 3.029,
+  "thickness_A": 3.029,
+  "vacuum_A": 20.0
+}

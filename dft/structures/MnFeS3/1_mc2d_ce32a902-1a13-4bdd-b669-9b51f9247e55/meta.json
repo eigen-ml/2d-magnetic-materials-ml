@@ -1,0 +1,44 @@
+{
+  "anonymous": "A3BC",
+  "candidate_ox": {
+    "Fe": 3,
+    "Mn": 3,
+    "S": -2
+  },
+  "citation": "Campi et al., ACS Nano 17, 11268 (2023); Mounet et al., Nat. Nanotechnol. 13, 246 (2018)",
+  "formula": "MnFeS3",
+  "group": "main",
+  "id": "ce32a902-1a13-4bdd-b669-9b51f9247e55",
+  "licence": "CC BY 4.0",
+  "mace_a_b_A": [
+    3.209,
+    5.478
+  ],
+  "mace_converged": true,
+  "mace_energy_eV_per_atom": -6.41804,
+  "mace_min_distance_A": 2.102,
+  "mace_model": "MACE-MP-0 medium",
+  "mace_steps": 31,
+  "mace_thickness_A": 6.892,
+  "mapping": {
+    "Ga": "Fe",
+    "In": "Mn",
+    "S": "S"
+  },
+  "min_distance_A": 2.218,
+  "note": "Unrelaxed starting structure; needs MLIP pre-relax and a VESTA check.",
+  "nsites": 10,
+  "prototype_formula": "GaInS3",
+  "prototype_ox": {
+    "Ga": 3,
+    "In": 3,
+    "S": -2
+  },
+  "rank": 1,
+  "score": 0.1977883538633818,
+  "source": "mc2d",
+  "spacegroup_symprec0.1": "Pmn2_1 (31)",
+  "start_thickness_A": 7.108,
+  "thickness_A": 7.108,
+  "vacuum_A": 20.0
+}

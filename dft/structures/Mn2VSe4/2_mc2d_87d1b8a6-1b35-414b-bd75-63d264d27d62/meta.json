@@ -1,0 +1,44 @@
+{
+  "anonymous": "A4B2C",
+  "candidate_ox": {
+    "Mn": 2,
+    "Se": -2,
+    "V": 4
+  },
+  "citation": "Campi et al., ACS Nano 17, 11268 (2023); Mounet et al., Nat. Nanotechnol. 13, 246 (2018)",
+  "formula": "Mn2VSe4",
+  "group": "main",
+  "id": "87d1b8a6-1b35-414b-bd75-63d264d27d62",
+  "licence": "CC BY 4.0",
+  "mace_a_b_A": [
+    3.319,
+    6.502
+  ],
+  "mace_converged": true,
+  "mace_energy_eV_per_atom": -6.37957,
+  "mace_min_distance_A": 2.336,
+  "mace_model": "MACE-MP-0 medium",
+  "mace_steps": 8,
+  "mace_thickness_A": 3.339,
+  "mapping": {
+    "Te": "Se",
+    "Ti": "V",
+    "V": "Mn"
+  },
+  "min_distance_A": 2.445,
+  "note": "Unrelaxed starting structure; needs MLIP pre-relax and a VESTA check.",
+  "nsites": 7,
+  "prototype_formula": "Te4TiV2",
+  "prototype_ox": {
+    "Te": -2,
+    "Ti": 4,
+    "V": 2
+  },
+  "rank": 2,
+  "score": 0.18767891077914878,
+  "source": "mc2d",
+  "spacegroup_symprec0.1": "C2/m (12)",
+  "start_thickness_A": 3.404,
+  "thickness_A": 3.404,
+  "vacuum_A": 20.0
+}

@@ -1,0 +1,43 @@
+{
+  "anonymous": "A2BC",
+  "candidate_ox": {
+    "Cl": -1,
+    "Mn": 3
+  },
+  "citation": "Campi et al., ACS Nano 17, 11268 (2023); Mounet et al., Nat. Nanotechnol. 13, 246 (2018)",
+  "formula": "MnBrCl2",
+  "group": "main",
+  "id": "19932144-5503-4957-b137-c9a5dcc42b28-o1",
+  "licence": "CC BY 4.0",
+  "mace_a_b_A": [
+    6.322,
+    6.259
+  ],
+  "mace_converged": true,
+  "mace_energy_eV_per_atom": -4.50382,
+  "mace_min_distance_A": 2.34,
+  "mace_model": "MACE-MP-0 medium",
+  "mace_steps": 20,
+  "mace_thickness_A": 2.81,
+  "mapping": {
+    "Cl": "Cl",
+    "Fe": "Mn"
+  },
+  "min_distance_A": 2.262,
+  "note": "Unrelaxed starting structure; needs MLIP pre-relax and a VESTA check.",
+  "nsites": 8,
+  "ordering_degeneracy": 6,
+  "parent_formula": "MnCl3",
+  "prototype_formula": "Cl3Fe",
+  "prototype_ox": {
+    "Cl": -1,
+    "Fe": 3
+  },
+  "rank": 1,
+  "score": 0.0,
+  "source": "mc2d-ordered",
+  "spacegroup_symprec0.1": "Cm (8)",
+  "start_thickness_A": 2.553,
+  "thickness_A": 2.553,
+  "vacuum_A": 20.0
+}
