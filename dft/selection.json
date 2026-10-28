@@ -8,19 +8,20 @@
     "after_S5": 361,
     "after_S6": 350,
     "after_S8": 350,
+    "after_S9": 208,
     "screened": 1577
   },
   "main": [
     "Mn2VSe4",
     "Mn2VS4",
     "Mn2CoSe4",
-    "MnFeTe3",
-    "MnFeSe3",
     "Mn2CoTe4",
     "Mn2CrS4",
     "Mn2CrTe4",
-    "MnNiBr3",
-    "MnNiCl3"
+    "MnFeS3",
+    "MnBr2Cl",
+    "MnBrCl2",
+    "CrCoSe3"
   ],
   "optimade_providers_answered": {
     "alexandria": true,

@@ -3,7 +3,8 @@
 
 S1 score, S2 in-distribution, S3 charge balance, S4 electronegativity, S5 not in
 a 2D database (OPTIMADE), S6 not in the 2D literature (OpenAlex, arXiv), S7 family
-diversity, S8 a same-stoichiometry 2D prototype exists. Network answers are cached
+diversity, S8 a same-stoichiometry 2D prototype exists, S9 the bulk composition is
+near the hull (Alexandria). Network answers are cached
 under dft/cache/ so a rerun does not query again.
 """
 
@@ -42,6 +43,7 @@ CATION_SET_LIMIT = 2
 MAIN_SIZE = 10
 THESIS_TOP = 10
 REFERENCES = ("CrI3", "VCl3")
+HULL_MAX = 0.1  # eV/atom, S9
 # An oxidation state is allowed when it makes up at least this share of the element's
 # non-zero ICSD (2024) entries; Co+1, for example, is 0.8% of cobalt's.
 OXIDATION_SHARE_MIN = 0.01
@@ -58,7 +60,7 @@ TWO_D_WORDS = re.compile(
     r"monolayer|two-dimensional|\b2D\b|single-layer|single layer|nanosheet|few-layer|exfoliat",
     re.IGNORECASE,
 )
-FILTERS = ("S1", "S2", "S3", "S4", "S5", "S6", "S8")
+FILTERS = ("S1", "S2", "S3", "S4", "S5", "S6", "S8", "S9")
 
 Fetch = Callable[[str, dict[str, Any]], dict[str, Any] | str]
 
@@ -458,7 +460,7 @@ def network_filters(
     evaluate: pd.Series,
     providers: dict[str, tuple[str, bool, str]] = OPTIMADE_PROVIDERS,
 ) -> tuple[pd.DataFrame, dict[str, bool]]:
-    """Apply S5, S6 and S8 to the rows selected by ``evaluate``."""
+    """Apply S5, S6, S8 and S9 to the rows selected by ``evaluate``."""
     table = table.copy()
     subset = table.loc[evaluate]
     formulas = sorted(set(subset["optimade_formula"]))
@@ -480,7 +482,7 @@ def network_filters(
     table["bulk_known"] = pd.NA
     table.loc[evaluate, "bulk_known"] = table.loc[evaluate, bulk].astype(bool).any(axis=1)
 
-    # Information only, not a filter: bulk energetics of the same composition in Alexandria.
+    # Bulk energetics of the same composition in Alexandria; the hull distance is S9.
     table["alexandria_hull_distance"] = pd.NA
     table["alexandria_formation_energy"] = pd.NA
     with ThreadPoolExecutor(max_workers=4) as pool:
@@ -489,6 +491,11 @@ def network_filters(
         hull, formation = energetics.get(table.at[index, "optimade_formula"], (None, None))
         table.at[index, "alexandria_hull_distance"] = hull
         table.at[index, "alexandria_formation_energy"] = formation
+    table["S9"] = pd.NA
+    table.loc[evaluate, "S9"] = [
+        hull is None or hull is pd.NA or float(hull) <= HULL_MAX
+        for hull in table.loc[evaluate, "alexandria_hull_distance"]
+    ]
 
     templates = sorted(set(table["anonymous_formula"]))
     prototypes: Counter = Counter()
@@ -614,7 +621,7 @@ def main(argv: list[str] | None = None) -> int:
     thesis_table = select_groups(table.loc[table["list"] == "thesis_top10"]).assign(group="thesis_top10")
     columns = [
         "group", "formula", "formula_plain", "magnetic_score", "raw_score", "first_failure",
-        "S1", "S2", "S3", "S4", "S5", "S6", "S7", "S8", "oxidation_states", "oxidation_likelihood",
+        "S1", "S2", "S3", "S4", "S5", "S6", "S7", "S8", "S9", "oxidation_states", "oxidation_likelihood",
         "alexandria_hull_distance", "alexandria_formation_energy", "anonymous_formula",
         "family", "cation_set", "training_template_count", "in_c2db",
         *[f"db_{name}" for name in OPTIMADE_PROVIDERS], "bulk_known", "prototype_count_2d",
@@ -626,7 +633,7 @@ def main(argv: list[str] | None = None) -> int:
 
     funnel = {"screened": int(len(v3))}
     alive = pd.Series(True, index=v3.index)
-    for name in ("S1", "S2", "S3", "S4", "S5", "S6", "S8"):
+    for name in FILTERS:
         alive &= v3[name].astype("boolean").fillna(False).astype(bool)
         funnel[f"after_{name}"] = int(alive.sum())
     summary = {

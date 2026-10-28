@@ -122,7 +122,7 @@ def _passing_row(formula, family, cations, raw):
     return {
         "formula": formula, "formula_plain": formula, "family": family, "cation_set": cations,
         "magnetic_score": 0.99, "raw_score": raw,
-        **{name: True for name in ("S1", "S2", "S3", "S4", "S5", "S6", "S8")},
+        **{name: True for name in ("S1", "S2", "S3", "S4", "S5", "S6", "S8", "S9")},
     }
 
 
@@ -141,3 +141,10 @@ def test_select_groups_caps_each_family_and_cation_set(filter_module):
     groups = dict(zip(table["formula"], table["group"]))
     assert [f for f in "ABCDEFG" if groups[f] == "main"] == ["A", "B", "D", "F"]
     assert table.set_index("formula").loc["G", "first_failure"] == "S6"
+
+
+def test_s9_fails_only_far_above_the_hull(filter_module):
+    row = _passing_row("X", "F1", "Mn+V", 0.9)
+    assert filter_module.first_failure(pd.Series(row)) == "pass"
+    row["S9"] = False
+    assert filter_module.first_failure(pd.Series(row)) == "S9"
