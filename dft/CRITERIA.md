@@ -76,4 +76,11 @@ kept unchanged. Ata decided these three changes after reviewing it:
    compositions above 0.1 eV/atom. 154 of the 350 candidates that passed S1-S8 are at or below it. This takes
    the place of the planned MLIP pre-screen as a filter; MLIP relaxation moves to stage P, where it picks the
    prototype.
-
+5. **DFT batch 1 goes ahead before the Mn diagnosis.** Nine of the main 10 contain Mn. A first check suggests the
+   model takes this from V2DB, whose ML labels call Mn compounds magnetic far more often than Cr, Fe or Co ones
+   (C2DB does not show the gap). The diagnosis is not finished. Batch 1 is the main 10 and the two references
+   exactly as listed in `dft/selection.json` at commit `fdaac55`. It is not edited or trimmed after the
+   diagnosis. If the diagnosis changes the model, the new list is batch 2 and is reported next to batch 1. Every
+   batch 1 result is reported, failures included. Reason: relax and phonon judge each structure on its own, so a
+   biased ranking changes which candidates get computed, not whether a computed one is stable. Cost: batch 1
+   says little about how well the model ranks non-Mn compounds.
