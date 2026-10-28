@@ -127,22 +127,37 @@ def oxidation_states(symbol: str) -> tuple[int, ...]:
 def charge_assignment(formula: str) -> tuple[bool, bool, dict[str, int] | None]:
     """Return (charge balanced, electronegativity ordered, the assignment used).
 
-    One oxidation state per element (SMACT rule). An electronegativity-ordered
-    assignment is preferred; otherwise the first neutral one is returned.
+    One oxidation state per element (SMACT rule). Among the valid assignments, the
+    one with the highest product of ICSD shares is returned, preferring an
+    electronegativity-ordered one.
     """
     amounts = integer_amounts(formula)
     symbols = sorted(amounts)
-    first_neutral: dict[str, int] | None = None
+    neutral: list[dict[str, int]] = []
+    ordered: list[dict[str, int]] = []
     for states in product(*(oxidation_states(symbol) for symbol in symbols)):
         if sum(state * amounts[symbol] for symbol, state in zip(symbols, states)) != 0:
             continue
         assignment = dict(zip(symbols, states))
-        first_neutral = first_neutral or assignment
+        neutral.append(assignment)
         cations = [Element(s).X for s, state in assignment.items() if state > 0]
         anions = [Element(s).X for s, state in assignment.items() if state < 0]
         if anions and (not cations or max(cations) < min(anions)):
-            return True, True, assignment
-    return first_neutral is not None, False, first_neutral
+            ordered.append(assignment)
+    pool = ordered or neutral
+    best = max(pool, key=assignment_likelihood) if pool else None
+    return bool(neutral), bool(ordered), best
+
+
+def assignment_likelihood(assignment: dict[str, int] | None) -> float:
+    """Product of the ICSD shares of the assigned states (1 = every state is the usual one)."""
+    if not assignment:
+        return 0.0
+    shares = icsd_state_shares()
+    value = 1.0
+    for symbol, state in assignment.items():
+        value *= shares.get(symbol, {}).get(state, 0.0)
+    return value
 
 
 def cation_set(formula: str, assignment: dict[str, int] | None) -> str:
@@ -344,6 +359,26 @@ def arxiv_works(client: CachedClient, variants: Sequence[str]) -> list[dict[str,
     return works
 
 
+def alexandria_energetics(client: CachedClient, formula: str) -> tuple[float | None, float | None]:
+    """Lowest hull distance and formation energy (eV/atom) of a formula in Alexandria PBE, if any."""
+    params = {
+        "filter": f'chemical_formula_reduced="{formula}"',
+        "response_fields": "_alexandria_hull_distance,_alexandria_formation_energy_per_atom",
+        "page_limit": 100,
+    }
+    response = client.get(OPTIMADE_PROVIDERS["alexandria"][0] + "/v1/structures", params)
+    if not isinstance(response, dict):
+        return None, None
+    attributes = [item.get("attributes", {}) for item in response.get("data", [])]
+    hulls = [a["_alexandria_hull_distance"] for a in attributes if a.get("_alexandria_hull_distance") is not None]
+    formation = [
+        a["_alexandria_formation_energy_per_atom"]
+        for a in attributes
+        if a.get("_alexandria_formation_energy_per_atom") is not None
+    ]
+    return (min(hulls) if hulls else None, min(formation) if formation else None)
+
+
 def literature_check(
     openalex: CachedClient,
     arxiv: CachedClient,
@@ -403,6 +438,7 @@ def local_filters(
                 "family": f"{anonymous}:{anion_set(formula, assignment)}",
                 "cation_set": cation_set(formula, assignment),
                 "oxidation_states": " ".join(f"{s}{v:+d}" for s, v in sorted((assignment or {}).items())),
+                "oxidation_likelihood": round(assignment_likelihood(assignment), 4),
                 "training_template_count": int(templates.get(anonymous, 0)),
                 "S1": record["magnetic_score"] >= SCORE_MIN,
                 "S2": templates.get(anonymous, 0) >= MIN_TEMPLATE_COUNT,
@@ -443,6 +479,16 @@ def network_filters(
     )
     table["bulk_known"] = pd.NA
     table.loc[evaluate, "bulk_known"] = table.loc[evaluate, bulk].astype(bool).any(axis=1)
+
+    # Information only, not a filter: bulk energetics of the same composition in Alexandria.
+    table["alexandria_hull_distance"] = pd.NA
+    table["alexandria_formation_energy"] = pd.NA
+    with ThreadPoolExecutor(max_workers=4) as pool:
+        energetics = dict(zip(formulas, pool.map(lambda f: alexandria_energetics(optimade, f), formulas)))
+    for index in table.index[evaluate]:
+        hull, formation = energetics.get(table.at[index, "optimade_formula"], (None, None))
+        table.at[index, "alexandria_hull_distance"] = hull
+        table.at[index, "alexandria_formation_energy"] = formation
 
     templates = sorted(set(table["anonymous_formula"]))
     prototypes: Counter = Counter()
@@ -568,7 +614,8 @@ def main(argv: list[str] | None = None) -> int:
     thesis_table = select_groups(table.loc[table["list"] == "thesis_top10"]).assign(group="thesis_top10")
     columns = [
         "group", "formula", "formula_plain", "magnetic_score", "raw_score", "first_failure",
-        "S1", "S2", "S3", "S4", "S5", "S6", "S7", "S8", "oxidation_states", "anonymous_formula",
+        "S1", "S2", "S3", "S4", "S5", "S6", "S7", "S8", "oxidation_states", "oxidation_likelihood",
+        "alexandria_hull_distance", "alexandria_formation_energy", "anonymous_formula",
         "family", "cation_set", "training_template_count", "in_c2db",
         *[f"db_{name}" for name in OPTIMADE_PROVIDERS], "bulk_known", "prototype_count_2d",
         "literature_hits", "literature_2d_hits", "literature_bulk", "literature_examples",

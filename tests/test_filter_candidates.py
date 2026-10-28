@@ -30,6 +30,15 @@ def test_charge_assignment(filter_module, formula, balanced, ordered):
         assert sum(assignment[s] * n for s, n in amounts.items()) == 0
 
 
+def test_charge_assignment_prefers_the_usual_states(filter_module):
+    pytest.importorskip("smact")
+    _, _, assignment = filter_module.charge_assignment("MnFeTe3")
+    assert assignment == {"Fe": 3, "Mn": 3, "Te": -2}
+    assert filter_module.assignment_likelihood(assignment) > filter_module.assignment_likelihood(
+        {"Fe": 2, "Mn": 4, "Te": -2}
+    )
+
+
 def test_formula_variants_put_cations_in_every_order(filter_module):
     pytest.importorskip("smact")
     _, _, assignment = filter_module.charge_assignment("Mn2FeO4")

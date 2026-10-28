@@ -3,24 +3,24 @@
   "funnel": {
     "after_S1": 759,
     "after_S2": 759,
-    "after_S3": 409,
-    "after_S4": 401,
-    "after_S5": 398,
-    "after_S6": 387,
-    "after_S8": 387,
+    "after_S3": 372,
+    "after_S4": 364,
+    "after_S5": 361,
+    "after_S6": 350,
+    "after_S8": 350,
     "screened": 1577
   },
   "main": [
     "Mn2VSe4",
-    "MnCoBr3",
     "Mn2VS4",
-    "MnCo2Br4",
-    "MnCoCl3",
-    "Mn2VTe4",
     "Mn2CoSe4",
     "MnFeTe3",
-    "MnCo2Cl4",
-    "MnFeSe3"
+    "MnFeSe3",
+    "Mn2CoTe4",
+    "Mn2CrS4",
+    "Mn2CrTe4",
+    "MnNiBr3",
+    "MnNiCl3"
   ],
   "optimade_providers_answered": {
     "alexandria": true,
@@ -31,10 +31,9 @@
   },
   "reference": [
     "CrI3",
-    "Mn2CoO4",
-    "Mn2CoS4"
+    "VCl3"
   ],
-  "run_date_utc": "2026-10-27",
+  "run_date_utc": "2026-10-28",
   "thesis_top10_first_failure": {
     "Fe2CoCl4": "S3",
     "Mn2CoCl4": "S3",
