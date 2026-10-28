@@ -1,0 +1,33 @@
+{
+  "anonymous": "A4B2C",
+  "candidate_ox": {
+    "Mn": 2,
+    "Se": -2,
+    "V": 4
+  },
+  "citation": "Zhou et al., Sci. Data 6, 86 (2019)",
+  "formula": "Mn2VSe4",
+  "group": "main",
+  "id": "2dm-4450",
+  "licence": "CC BY 4.0",
+  "mapping": {
+    "Fe": "Mn",
+    "Se": "Se",
+    "Ti": "V"
+  },
+  "min_distance_A": 2.334,
+  "note": "Unrelaxed starting structure; needs MLIP pre-relax and a VESTA check.",
+  "nsites": 7,
+  "prototype_formula": "Fe2Se4Ti",
+  "prototype_ox": {
+    "Fe": 2,
+    "Se": -2,
+    "Ti": 4
+  },
+  "rank": 1,
+  "score": 0.08790487306682224,
+  "source": "twodmatpedia",
+  "spacegroup_symprec0.1": "P-1 (2)",
+  "thickness_A": 3.362,
+  "vacuum_A": 20.0
+}

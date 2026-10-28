@@ -1,0 +1,33 @@
+{
+  "anonymous": "A3BC",
+  "candidate_ox": {
+    "Co": 3,
+    "Cr": 3,
+    "Se": -2
+  },
+  "citation": "Campi et al., ACS Nano 17, 11268 (2023); Mounet et al., Nat. Nanotechnol. 13, 246 (2018)",
+  "formula": "CrCoSe3",
+  "group": "main",
+  "id": "7a34bd72-c68a-479c-9f9a-eb2cafdfebd1",
+  "licence": "CC BY 4.0",
+  "mapping": {
+    "Fe": "Cr",
+    "P": "Co",
+    "Se": "Se"
+  },
+  "min_distance_A": 2.226,
+  "note": "Unrelaxed starting structure; needs MLIP pre-relax and a VESTA check.",
+  "nsites": 10,
+  "prototype_formula": "FePSe3",
+  "prototype_ox": {
+    "Fe": 3,
+    "P": 3,
+    "Se": -2
+  },
+  "rank": 3,
+  "score": 0.33132000878541634,
+  "source": "mc2d",
+  "spacegroup_symprec0.1": "P31m (157)",
+  "thickness_A": 2.883,
+  "vacuum_A": 20.0
+}

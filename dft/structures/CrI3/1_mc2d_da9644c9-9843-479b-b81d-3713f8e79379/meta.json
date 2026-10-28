@@ -1,0 +1,30 @@
+{
+  "anonymous": "A3B",
+  "candidate_ox": {
+    "Cr": 3,
+    "I": -1
+  },
+  "citation": "Campi et al., ACS Nano 17, 11268 (2023); Mounet et al., Nat. Nanotechnol. 13, 246 (2018)",
+  "formula": "CrI3",
+  "group": "reference",
+  "id": "da9644c9-9843-479b-b81d-3713f8e79379",
+  "licence": "CC BY 4.0",
+  "mapping": {
+    "Cr": "Cr",
+    "I": "I"
+  },
+  "min_distance_A": 2.681,
+  "note": "Unrelaxed starting structure; needs MLIP pre-relax and a VESTA check.",
+  "nsites": 8,
+  "prototype_formula": "CrI3",
+  "prototype_ox": {
+    "Cr": 3,
+    "I": -1
+  },
+  "rank": 1,
+  "score": 0.0,
+  "source": "mc2d",
+  "spacegroup_symprec0.1": "P-31m (162)",
+  "thickness_A": 3.049,
+  "vacuum_A": 20.0
+}

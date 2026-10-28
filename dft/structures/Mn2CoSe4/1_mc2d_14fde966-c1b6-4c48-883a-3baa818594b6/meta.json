@@ -1,0 +1,33 @@
+{
+  "anonymous": "A4B2C",
+  "candidate_ox": {
+    "Co": 2,
+    "Mn": 3,
+    "Se": -2
+  },
+  "citation": "Campi et al., ACS Nano 17, 11268 (2023); Mounet et al., Nat. Nanotechnol. 13, 246 (2018)",
+  "formula": "Mn2CoSe4",
+  "group": "main",
+  "id": "14fde966-c1b6-4c48-883a-3baa818594b6",
+  "licence": "CC BY 4.0",
+  "mapping": {
+    "Ga": "Mn",
+    "Mg": "Co",
+    "Se": "Se"
+  },
+  "min_distance_A": 2.363,
+  "note": "Unrelaxed starting structure; needs MLIP pre-relax and a VESTA check.",
+  "nsites": 7,
+  "prototype_formula": "Ga2MgSe4",
+  "prototype_ox": {
+    "Ga": 3,
+    "Mg": 2,
+    "Se": -2
+  },
+  "rank": 1,
+  "score": 0.061964504283965785,
+  "source": "mc2d",
+  "spacegroup_symprec0.1": "P-3m1 (164)",
+  "thickness_A": 9.781,
+  "vacuum_A": 20.0
+}

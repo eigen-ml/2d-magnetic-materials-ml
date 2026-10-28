@@ -1,0 +1,33 @@
+{
+  "anonymous": "A4B2C",
+  "candidate_ox": {
+    "Co": 2,
+    "Mn": 3,
+    "Te": -2
+  },
+  "citation": "Campi et al., ACS Nano 17, 11268 (2023); Mounet et al., Nat. Nanotechnol. 13, 246 (2018)",
+  "formula": "Mn2CoTe4",
+  "group": "main",
+  "id": "ca7ee60b-e8a9-40b3-b696-2e275af3369c",
+  "licence": "CC BY 4.0",
+  "mapping": {
+    "Ge": "Co",
+    "Sb": "Mn",
+    "Te": "Te"
+  },
+  "min_distance_A": 2.946,
+  "note": "Unrelaxed starting structure; needs MLIP pre-relax and a VESTA check.",
+  "nsites": 7,
+  "prototype_formula": "GeSb2Te4",
+  "prototype_ox": {
+    "Ge": 2,
+    "Sb": 3,
+    "Te": -2
+  },
+  "rank": 2,
+  "score": 0.1450191570881226,
+  "source": "mc2d",
+  "spacegroup_symprec0.1": "P-3m1 (164)",
+  "thickness_A": 10.617,
+  "vacuum_A": 20.0
+}

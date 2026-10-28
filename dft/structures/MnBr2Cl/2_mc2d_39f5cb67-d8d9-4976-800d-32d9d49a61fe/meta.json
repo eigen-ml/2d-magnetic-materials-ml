@@ -1,0 +1,33 @@
+{
+  "anonymous": "A2BC",
+  "candidate_ox": {
+    "Br": -1,
+    "Cl": -1,
+    "Mn": 3
+  },
+  "citation": "Campi et al., ACS Nano 17, 11268 (2023); Mounet et al., Nat. Nanotechnol. 13, 246 (2018)",
+  "formula": "MnBr2Cl",
+  "group": "main",
+  "id": "39f5cb67-d8d9-4976-800d-32d9d49a61fe",
+  "licence": "CC BY 4.0",
+  "mapping": {
+    "Au": "Mn",
+    "Cl": "Cl",
+    "Te": "Br"
+  },
+  "min_distance_A": 3.065,
+  "note": "Unrelaxed starting structure; needs MLIP pre-relax and a VESTA check.",
+  "nsites": 8,
+  "prototype_formula": "AuClTe2",
+  "prototype_ox": {
+    "Au": 3,
+    "Cl": -1,
+    "Te": -1
+  },
+  "rank": 2,
+  "score": 0.5070707070707071,
+  "source": "mc2d",
+  "spacegroup_symprec0.1": "Pmma (51)",
+  "thickness_A": 4.246,
+  "vacuum_A": 20.0
+}
