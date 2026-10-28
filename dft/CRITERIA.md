@@ -27,13 +27,14 @@ that pass S1-S4, and for the thesis top 10.
 | S6 | Not in the 2D literature | OpenAlex (title and abstract) and arXiv (all fields) are searched for the formula in each ordering of its cations. If any returned work has the formula together with a 2D word (monolayer, two-dimensional, 2D, single-layer, nanosheet, few-layer, exfoliat*) in its title or abstract, it fails. Hits without a 2D word are recorded as `literature_bulk` and pass. |
 | S7 | Diversity | Family = anonymous formula + set of anions. Among the selected 10, at most 2 per family **and** at most 2 per cation set (e.g. {Mn, V}), highest scores first. *(Cation cap added 2026-10-28.)* |
 | S8 | A 2D structure can be built | At least one 2D entry with the same anonymous formula exists in MC2D or 2DMatPedia, to serve as a prototype for element substitution (stage P). |
+| S9 | Bulk stability | The lowest Alexandria (PBE) hull distance of the same composition in bulk is at most 0.1 eV/atom. With no Alexandria entry the candidate passes, and the missing value is visible in the table. A 2D sheet can sit a little above its bulk, but a composition far above the hull in every bulk structure is unlikely to be stable as a monolayer. *(Added 2026-10-28.)* |
 
 Ranking: calibrated score, then the raw boosting score. That order breaks ties, because isotonic calibration
 flattens the top of the scale.
 
 ## Groups
 
-- **Main (10):** the 10 highest-ranked candidates that pass S1-S8. These go to DFT: ISIF=3 relax, ISIF=2 relax,
+- **Main (10):** the 10 highest-ranked candidates that pass S1-S9. These go to DFT: ISIF=3 relax, ISIF=2 relax,
   then phonons.
 - **Reference:** CrI3 and VCl3. Both are known 2D magnets with published DFT numbers. CrI3 checks the protocol;
   VCl3 is close to the ABX3 candidates. *(Fixed 2026-10-28; this replaces automatic picks.)*
@@ -69,4 +70,10 @@ kept unchanged. Ata decided these three changes after reviewing it:
 3. **Reference group.** The automatic extra references (Mn2CoO4, Mn2CoS4) had failed S6 on electrochemistry
    papers about "nanosheets", which give no 2D magnetic numbers to compare with. The references are now CrI3
    and VCl3.
+4. **S9 bulk stability.** After the rerun (`ba182d8`), four of the main 10 sat far above the bulk hull in
+   Alexandria: MnFeTe3 0.78, MnFeSe3 1.37, MnNiBr3 0.68 and MnNiCl3 0.67 eV/atom. MnFeTe3 and MnFeSe3 also have
+   positive formation energies. Spending relax and phonon time on them is unlikely to pay off, so S9 drops
+   compositions above 0.1 eV/atom. 154 of the 350 candidates that passed S1-S8 are at or below it. This takes
+   the place of the planned MLIP pre-screen as a filter; MLIP relaxation moves to stage P, where it picks the
+   prototype.
 
