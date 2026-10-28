@@ -10,6 +10,16 @@
   "group": "main",
   "id": "2dm-4450",
   "licence": "CC BY 4.0",
+  "mace_a_b_A": [
+    3.706,
+    6.055
+  ],
+  "mace_converged": true,
+  "mace_energy_eV_per_atom": -6.88294,
+  "mace_min_distance_A": 2.206,
+  "mace_model": "MACE-MP-0 medium",
+  "mace_steps": 26,
+  "mace_thickness_A": 3.089,
   "mapping": {
     "Fe": "Mn",
     "Se": "S",
@@ -28,6 +38,7 @@
   "score": 0.16399182958856143,
   "source": "twodmatpedia",
   "spacegroup_symprec0.1": "P-1 (2)",
+  "start_thickness_A": 3.175,
   "thickness_A": 3.175,
   "vacuum_A": 20.0
 }

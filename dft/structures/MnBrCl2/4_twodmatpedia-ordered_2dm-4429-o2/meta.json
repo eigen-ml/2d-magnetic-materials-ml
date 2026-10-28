@@ -1,0 +1,43 @@
+{
+  "anonymous": "A2BC",
+  "candidate_ox": {
+    "Cl": -1,
+    "Mn": 3
+  },
+  "citation": "Zhou et al., Sci. Data 6, 86 (2019)",
+  "formula": "MnBrCl2",
+  "group": "main",
+  "id": "2dm-4429-o2",
+  "licence": "CC BY 4.0",
+  "mace_a_b_A": [
+    3.936,
+    12.009
+  ],
+  "mace_converged": true,
+  "mace_energy_eV_per_atom": -4.41907,
+  "mace_min_distance_A": 2.159,
+  "mace_model": "MACE-MP-0 medium",
+  "mace_steps": 62,
+  "mace_thickness_A": 6.913,
+  "mapping": {
+    "Cl": "Cl",
+    "Fe": "Mn"
+  },
+  "min_distance_A": 2.136,
+  "note": "Unrelaxed starting structure; needs MLIP pre-relax and a VESTA check.",
+  "nsites": 8,
+  "ordering_degeneracy": 2,
+  "parent_formula": "MnCl3",
+  "prototype_formula": "Cl3Fe",
+  "prototype_ox": {
+    "Cl": -1,
+    "Fe": 3
+  },
+  "rank": 4,
+  "score": 0.0,
+  "source": "twodmatpedia-ordered",
+  "spacegroup_symprec0.1": "P1 (1)",
+  "start_thickness_A": 5.646,
+  "thickness_A": 5.646,
+  "vacuum_A": 20.0
+}

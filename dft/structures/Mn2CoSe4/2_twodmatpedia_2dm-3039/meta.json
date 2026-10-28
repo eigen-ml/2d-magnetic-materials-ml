@@ -10,6 +10,16 @@
   "group": "main",
   "id": "2dm-3039",
   "licence": "CC BY 4.0",
+  "mace_a_b_A": [
+    3.733,
+    3.733
+  ],
+  "mace_converged": true,
+  "mace_energy_eV_per_atom": -5.87391,
+  "mace_min_distance_A": 2.256,
+  "mace_model": "MACE-MP-0 medium",
+  "mace_steps": 10,
+  "mace_thickness_A": 9.363,
   "mapping": {
     "Ga": "Mn",
     "S": "Se",
@@ -28,6 +38,7 @@
   "score": 0.12092949620039414,
   "source": "twodmatpedia",
   "spacegroup_symprec0.1": "P3m1 (156)",
+  "start_thickness_A": 9.725,
   "thickness_A": 9.725,
   "vacuum_A": 20.0
 }

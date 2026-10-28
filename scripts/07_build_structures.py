@@ -159,12 +159,105 @@ def checks(structure: Structure) -> dict[str, Any]:
     return {"min_distance_A": round(float(dist.min()), 3), "spacegroup_symprec0.1": spacegroup, "nsites": len(structure)}
 
 
+def prototype_options(client: Any, formula: str, group: str, min_distance: float) -> list[dict]:
+    """Every usable prototype for the formula, built and checked, not yet ranked."""
+    options = []
+    for source, (base_url, citation, licence) in SOURCES.items():
+        for entry in fetch_prototypes(client, base_url, filters.optimade_anonymous(formula)):
+            proto_formula = entry["attributes"].get("chemical_formula_reduced") or ""
+            matched = site_map(formula, proto_formula)
+            if matched is None:
+                continue
+            mapping, proto_ox, cand_ox = matched
+            # references keep their own structure, so only exact matches count for them
+            exact = filters.optimade_formula(proto_formula) == filters.optimade_formula(formula)
+            if group == "reference" and not exact:
+                continue
+            try:
+                structure, thickness = build(entry, mapping, proto_ox, cand_ox)
+            except (KeyError, TypeError, ValueError, np.linalg.LinAlgError):
+                continue
+            info = checks(structure)
+            if info["min_distance_A"] < min_distance:
+                continue
+            options.append({
+                "structure": structure,
+                "score": 0.0 if exact else mismatch(mapping, proto_ox, cand_ox),
+                "source": source, "id": str(entry["id"]), "prototype_formula": proto_formula,
+                "mapping": mapping, "prototype_ox": proto_ox, "candidate_ox": cand_ox,
+                "thickness_A": round(thickness, 3), "citation": citation, "licence": licence, **info,
+            })
+    return options
+
+
+def distinct(options: list[dict]) -> list[dict]:
+    """Rank by mismatch; the same prototype from two databases is kept once per spacegroup and size."""
+    options = sorted(options, key=lambda o: (o["score"], o["nsites"]))
+    seen, kept = set(), []
+    for option in options:
+        tag = (option["spacegroup_symprec0.1"], option["nsites"])
+        if tag not in seen:
+            seen.add(tag)
+            kept.append(option)
+    return kept
+
+
+def mixed_anion_parent(formula: str) -> tuple[str, str, str, float] | None:
+    """For one cation and two anions (MnBr2Cl): the single-anion parent (MnBr3), both anions, minor share."""
+    amounts = filters.integer_amounts(formula)
+    _, _, ox = filters.charge_assignment(formula)
+    if ox is None:
+        return None
+    cations = [s for s in amounts if ox[s] > 0]
+    anions = sorted((s for s in amounts if ox[s] < 0), key=lambda s: (-amounts[s], s))
+    if len(cations) != 1 or len(anions) != 2 or ox[anions[0]] != ox[anions[1]]:
+        return None
+    major, minor = anions
+    total = amounts[major] + amounts[minor]
+    count = amounts[cations[0]]
+    parent = f"{cations[0]}{count if count != 1 else ''}{major}{total}"
+    return parent, major, minor, amounts[minor] / total
+
+
+def anion_orderings(base: dict, major: str, minor: str, share: float, min_distance: float) -> list[dict]:
+    """Every symmetry-distinct way to put the minor anion on the parent's anion sites, in the parent cell."""
+    from itertools import combinations
+
+    from pymatgen.analysis.structure_matcher import StructureMatcher
+
+    parent = base["structure"]
+    sites = [i for i, site in enumerate(parent) if site.specie.symbol == major]
+    k = share * len(sites)
+    if abs(k - round(k)) > 1e-6:
+        return []  # needs a supercell; not handled here
+    candidates = []
+    for chosen in combinations(sites, int(round(k))):
+        structure = parent.copy()
+        for i in chosen:
+            structure.replace(i, minor)
+        candidates.append(structure.get_sorted_structure())
+    groups = StructureMatcher(primitive_cell=False, scale=False).group_structures(candidates)
+    options = []
+    for j, group_ in enumerate(groups):
+        structure = group_[0]
+        info = checks(structure)
+        if info["min_distance_A"] < min_distance:
+            continue
+        option = {key: value for key, value in base.items() if key not in ("structure", "nsites", "min_distance_A",
+                                                                          "spacegroup_symprec0.1")}
+        option.update(structure=structure, source=f"{base['source']}-ordered", id=f"{base['id']}-o{j + 1}",
+                      ordering_degeneracy=len(group_), parent_formula=filters.plain_formula(parent.formula), **info)
+        options.append(option)
+    return options
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     parser.add_argument("--selection", type=Path, default=ROOT / "dft" / "selection.json")
     parser.add_argument("--out", type=Path, default=ROOT / "dft" / "structures")
     parser.add_argument("--cache", type=Path, default=ROOT / "dft" / "cache" / "optimade")
     parser.add_argument("--keep", type=int, default=3, help="prototypes written per candidate")
+    parser.add_argument("--max-orderings", type=int, default=8, help="anion orderings written per mixed-anion candidate")
     parser.add_argument("--min-distance", type=float, default=1.6, help="drop structures with closer atoms (A)")
     args = parser.parse_args()
 
@@ -174,41 +267,17 @@ def main() -> None:
     rows = []
     for formula, group in formulas:
         anonymous = filters.optimade_anonymous(formula)
-        options = []
-        for source, (base_url, citation, licence) in SOURCES.items():
-            for entry in fetch_prototypes(client, base_url, anonymous):
-                proto_formula = entry["attributes"].get("chemical_formula_reduced") or ""
-                matched = site_map(formula, proto_formula)
-                if matched is None:
-                    continue
-                mapping, proto_ox, cand_ox = matched
-                # references keep their own structure, so only exact matches count for them
-                exact = filters.optimade_formula(proto_formula) == filters.optimade_formula(formula)
-                if group == "reference" and not exact:
-                    continue
-                try:
-                    structure, thickness = build(entry, mapping, proto_ox, cand_ox)
-                except (KeyError, TypeError, ValueError, np.linalg.LinAlgError):
-                    continue
-                info = checks(structure)
-                if info["min_distance_A"] < args.min_distance:
-                    continue
-                options.append({
-                    "structure": structure,
-                    "score": 0.0 if exact else mismatch(mapping, proto_ox, cand_ox),
-                    "source": source, "id": str(entry["id"]), "prototype_formula": proto_formula,
-                    "mapping": mapping, "prototype_ox": proto_ox, "candidate_ox": cand_ox,
-                    "thickness_A": round(thickness, 3), "citation": citation, "licence": licence, **info,
-                })
-        # same prototype from two databases: keep one per spacegroup and size
-        options.sort(key=lambda o: (o["score"], o["nsites"]))
-        seen, kept = set(), []
-        for option in options:
-            tag = (option["spacegroup_symprec0.1"], option["nsites"])
-            if tag not in seen:
-                seen.add(tag)
-                kept.append(option)
-        kept = kept[: args.keep]
+        parent = mixed_anion_parent(formula)
+        if parent is None:
+            options = prototype_options(client, formula, group, args.min_distance)
+            kept = distinct(options)[: args.keep]
+        else:
+            # the database prototypes for A2BC are chalcogen-halides of other kinds; build on the MX3 layer instead
+            parent_formula, major, minor, share = parent
+            options = []
+            for base in distinct(prototype_options(client, parent_formula, group, args.min_distance))[:2]:
+                options += anion_orderings(base, major, minor, share, args.min_distance)
+            kept = options[: args.max_orderings]
         if not kept:
             rows.append({"formula": formula, "group": group, "anonymous": anonymous, "rank": None})
         for rank, option in enumerate(kept, 1):

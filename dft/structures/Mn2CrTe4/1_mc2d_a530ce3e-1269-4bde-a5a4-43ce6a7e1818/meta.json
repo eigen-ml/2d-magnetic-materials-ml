@@ -10,6 +10,16 @@
   "group": "main",
   "id": "a530ce3e-1269-4bde-a5a4-43ce6a7e1818",
   "licence": "CC BY 4.0",
+  "mace_a_b_A": [
+    4.168,
+    4.168
+  ],
+  "mace_converged": true,
+  "mace_energy_eV_per_atom": -5.83107,
+  "mace_min_distance_A": 2.669,
+  "mace_model": "MACE-MP-0 medium",
+  "mace_steps": 2,
+  "mace_thickness_A": 10.534,
   "mapping": {
     "Cr": "Cr",
     "Ga": "Mn",
@@ -28,6 +38,7 @@
   "score": 0.15789473684210514,
   "source": "mc2d",
   "spacegroup_symprec0.1": "P-3m1 (164)",
+  "start_thickness_A": 10.601,
   "thickness_A": 10.601,
   "vacuum_A": 20.0
 }
