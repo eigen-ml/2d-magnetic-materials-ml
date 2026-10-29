@@ -1,0 +1,21 @@
+{
+  "decision_threshold": 0.4107142857142857,
+  "generated_formula_strings": 3328,
+  "interpretation": "Selected rows are composition proposals absent from the supplied reference set, not validated materials or globally novel compounds.",
+  "invalid_generated_formulas": 0,
+  "model_version": "v4.0_c2db_lowest_hull",
+  "reference_matches_excluded": 513,
+  "reference_set_size": 141171,
+  "score_band_counts": {
+    "0.80-0.90": 534,
+    "0.90-0.95": 135,
+    "0.95-0.98": 101,
+    "0.98-1.00": 564,
+    "threshold-0.80": 838
+  },
+  "scores_calibrated": true,
+  "selected_at_threshold": 2172,
+  "unique_reduced_compositions": 3328,
+  "unseen_compositions_scored": 2815,
+  "unsupported_compositions_skipped": 0
+}

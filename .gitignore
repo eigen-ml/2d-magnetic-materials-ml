@@ -45,3 +45,4 @@ slurm-*.out
 .venv-mlip/
 # Third-party data that may not be redistributed (C2DB, see DATASET_NOTES.md)
 /data/external/
+/data/v4/

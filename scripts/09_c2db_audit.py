@@ -83,6 +83,9 @@ def read_db(path: Path) -> pd.DataFrame:
         )
     table = pd.DataFrame.from_records(records)
     table["formula_normalized"] = table["formula_db"].map(reduced)
+    moment_label = (table["magmom"].abs() > MAGMOM_THRESHOLD).astype(float).where(table["magmom"].notna())
+    # No moment means a non-spin-polarized calculation, and C2DB's is_magnetic key says 0.
+    table["db_label"] = moment_label.fillna(table["is_magnetic_key"])
     return table
 
 
@@ -91,12 +94,6 @@ def read_thesis(path: Path) -> pd.DataFrame:
     table = table.loc[table["source"].astype(str).str.upper() == "C2DB"].copy()
     table["formula_normalized"] = table["formula_normalized"].map(reduced)
     return table
-
-
-def label(magmom: object) -> int | None:
-    if magmom is None or pd.isna(magmom):
-        return None
-    return int(abs(float(magmom)) >= MAGMOM_THRESHOLD)
 
 
 def magmom_bins(values: pd.Series) -> dict[str, int]:
@@ -128,7 +125,6 @@ def audit(db: pd.DataFrame, thesis: pd.DataFrame) -> dict:
 
     lowest = db.sort_values("ehull").drop_duplicates("formula_normalized")
     pair = thesis.merge(lowest, on="formula_normalized", suffixes=("_thesis", "_db"))
-    pair["db_label"] = pair["magmom_db"].map(label)
     with_label = pair.loc[pair["db_label"].notna()]
     with_key = pair.loc[pair["is_magnetic_key"].notna()]
 
@@ -145,11 +141,11 @@ def audit(db: pd.DataFrame, thesis: pd.DataFrame) -> dict:
     }
 
     mn_db = lowest.loc[lowest["formula_normalized"].map(lambda f: contains(f, "Mn"))]
-    mn_labels = mn_db["magmom"].map(label).dropna()
+    mn_labels = mn_db["db_label"].dropna()
     metal_share = {}
     for metal in METALS:
         rows = lowest.loc[lowest["formula_normalized"].map(lambda f, m=metal: contains(f, m))]
-        labels = rows["magmom"].map(label).dropna()
+        labels = rows["db_label"].dropna()
         metal_share[metal] = {"formulas": int(len(rows)), "magnetic_share": round(float(labels.mean()), 3)}
 
     known = {}
@@ -177,6 +173,10 @@ def audit(db: pd.DataFrame, thesis: pd.DataFrame) -> dict:
             "origin_rows": {k: int(v) for k, v in db["origin"].value_counts().sort_index().items()},
             "rows_with_is_magnetic_key": int(db["is_magnetic_key"].notna().sum()),
             "rows_with_magmom": int(db["magmom"].notna().sum()),
+            "rows_without_magmom_by_is_magnetic_key": {
+                str(k): int(v)
+                for k, v in db.loc[db["magmom"].isna(), "is_magnetic_key"].fillna(-1).astype(int).value_counts().items()
+            },
             "abs_magmom_bins": magmom_bins(db["magmom"]),
             "rows_with_antiparallel_site_moments": int(db["antiparallel"].eq(True).sum()),
         },
@@ -201,14 +201,14 @@ def audit(db: pd.DataFrame, thesis: pd.DataFrame) -> dict:
         },
         "label_agreement_lowest_hull_polymorph": {
             "overlap": int(len(pair)),
-            "with_db_magmom": int(len(with_label)),
-            "thesis_vs_db_magmom": confusion(with_label["is_magnetic"], with_label["db_label"]),
+            "with_db_label": int(len(with_label)),
+            "thesis_vs_db_label": confusion(with_label["is_magnetic"], with_label["db_label"]),
             "with_is_magnetic_key": int(len(with_key)),
             "thesis_vs_is_magnetic_key": confusion(with_key["is_magnetic"], with_key["is_magnetic_key"]),
         },
         "mn_lowest_hull": {
             "formulas": int(len(mn_db)),
-            "with_magmom": int(len(mn_labels)),
+            "with_label": int(len(mn_labels)),
             "magnetic_share": round(float(mn_labels.mean()), 3),
             "antiparallel_rows": int(mn_db["antiparallel"].eq(True).sum()),
         },

@@ -22,6 +22,10 @@
     "rows_with_antiparallel_site_moments": 88,
     "rows_with_is_magnetic_key": 8701,
     "rows_with_magmom": 13844,
+    "rows_without_magmom_by_is_magnetic_key": {
+      "0": 3060,
+      "1": 1
+    },
     "unique_formulas": 13251
   },
   "db_file": {
@@ -325,10 +329,10 @@
   },
   "label_agreement_lowest_hull_polymorph": {
     "overlap": 13251,
-    "thesis_vs_db_magmom": {
-      "thesis0_db0": 8186,
-      "thesis0_db1": 62,
-      "thesis1_db0": 50,
+    "thesis_vs_db_label": {
+      "thesis0_db0": 9809,
+      "thesis0_db1": 63,
+      "thesis1_db0": 121,
       "thesis1_db1": 3258
     },
     "thesis_vs_is_magnetic_key": {
@@ -337,21 +341,21 @@
       "thesis1_db0": 118,
       "thesis1_db1": 1149
     },
-    "with_db_magmom": 11556,
+    "with_db_label": 13251,
     "with_is_magnetic_key": 5972
   },
   "metal_magnetic_share_lowest_hull": {
     "Co": {
       "formulas": 464,
-      "magnetic_share": 0.632
+      "magnetic_share": 0.588
     },
     "Cr": {
       "formulas": 435,
-      "magnetic_share": 0.912
+      "magnetic_share": 0.853
     },
     "Fe": {
       "formulas": 568,
-      "magnetic_share": 0.875
+      "magnetic_share": 0.838
     },
     "Mn": {
       "formulas": 865,
@@ -359,18 +363,18 @@
     },
     "Ni": {
       "formulas": 775,
-      "magnetic_share": 0.4
+      "magnetic_share": 0.375
     },
     "V": {
       "formulas": 530,
-      "magnetic_share": 0.704
+      "magnetic_share": 0.636
     }
   },
   "mn_lowest_hull": {
     "antiparallel_rows": 47,
     "formulas": 865,
     "magnetic_share": 0.975,
-    "with_magmom": 865
+    "with_label": 865
   },
   "s5_recheck": {
     "batch1": {
@@ -437,7 +441,7 @@
       "above_lowest_by_more_than_0.05": 994,
       "formulas": 1892,
       "highest_hull": 1246,
-      "label_differs_from_lowest_hull": 112,
+      "label_differs_from_lowest_hull": 184,
       "lowest_hull": 321
     },
     "not_in_db_examples": [],

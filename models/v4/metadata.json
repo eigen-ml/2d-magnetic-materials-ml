@@ -1,0 +1,260 @@
+{
+  "data": {
+    "class_distribution": {
+      "magnetic": 3321,
+      "non_magnetic": 9930
+    },
+    "rows_featurized": 13251,
+    "rows_read": 13251,
+    "sha256": "c31ace4cf8209059b924bc7a511dc82730ad630c09c222592b64817b3a10405e"
+  },
+  "feature_names": [
+    "elem_Ag",
+    "elem_Al",
+    "elem_As",
+    "elem_Au",
+    "elem_B",
+    "elem_Ba",
+    "elem_Be",
+    "elem_Bi",
+    "elem_Br",
+    "elem_C",
+    "elem_Ca",
+    "elem_Cd",
+    "elem_Cl",
+    "elem_Co",
+    "elem_Cr",
+    "elem_Cs",
+    "elem_Cu",
+    "elem_F",
+    "elem_Fe",
+    "elem_Ga",
+    "elem_Ge",
+    "elem_H",
+    "elem_Hf",
+    "elem_Hg",
+    "elem_I",
+    "elem_In",
+    "elem_Ir",
+    "elem_K",
+    "elem_Li",
+    "elem_Mg",
+    "elem_Mn",
+    "elem_Mo",
+    "elem_N",
+    "elem_Na",
+    "elem_Nb",
+    "elem_Ni",
+    "elem_O",
+    "elem_Os",
+    "elem_P",
+    "elem_Pb",
+    "elem_Pd",
+    "elem_Pt",
+    "elem_Rb",
+    "elem_Re",
+    "elem_Rh",
+    "elem_Ru",
+    "elem_S",
+    "elem_Sb",
+    "elem_Sc",
+    "elem_Se",
+    "elem_Si",
+    "elem_Sn",
+    "elem_Sr",
+    "elem_Ta",
+    "elem_Te",
+    "elem_Ti",
+    "elem_Tl",
+    "elem_V",
+    "elem_W",
+    "elem_Xe",
+    "elem_Y",
+    "elem_Zn",
+    "elem_Zr"
+  ],
+  "feature_set": "elements",
+  "model": {
+    "class": "sklearn.ensemble.GradientBoostingClassifier",
+    "parameters": {
+      "ccp_alpha": 0.0,
+      "criterion": "friedman_mse",
+      "init": null,
+      "learning_rate": 0.06,
+      "loss": "log_loss",
+      "max_depth": 8,
+      "max_features": "sqrt",
+      "max_leaf_nodes": null,
+      "min_impurity_decrease": 0.0,
+      "min_samples_leaf": 2,
+      "min_samples_split": 4,
+      "min_weight_fraction_leaf": 0.0,
+      "n_estimators": 300,
+      "n_iter_no_change": null,
+      "random_state": 42,
+      "subsample": 0.85,
+      "tol": 0.0001,
+      "validation_fraction": 0.1,
+      "verbose": 0,
+      "warm_start": false
+    },
+    "weighting": {
+      "c2db_weight": 1.0,
+      "class_weight_factor": 0.35,
+      "magnetic_sample_weight": 1.0392156862745099
+    }
+  },
+  "model_version": "v4.0_c2db_lowest_hull",
+  "n_features": 63,
+  "natoms_seen_by_source": {
+    "C2DB": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      23,
+      25,
+      27,
+      31,
+      33,
+      37,
+      41,
+      49,
+      51
+    ]
+  },
+  "schema_version": 1,
+  "scientific_scope": {
+    "calibration": "isotonic, fitted on the validation split",
+    "input": "reduced chemical composition only",
+    "scores_calibrated": true,
+    "structural_features_used": false,
+    "target": "is_magnetic column of c2db_lowest_hull.csv"
+  },
+  "software_versions": {
+    "joblib": "1.6.0",
+    "numpy": "2.5.4",
+    "pandas": "2.3.3",
+    "pymatgen": "2026.10.24",
+    "python": "3.12.16",
+    "scikit-learn": "1.7.2"
+  },
+  "split": {
+    "like": {
+      "file": "combined_net_moment.csv",
+      "sha256": "04c4d5f4ecd65926750818d4fa505eafe40805e22df6990b038d3fef29081a34"
+    },
+    "random_state": 42,
+    "test_rows": 2604,
+    "train_rows": 8502,
+    "validation_rows": 2145
+  },
+  "test_metrics": {
+    "accuracy": 0.9051459293394777,
+    "band_precision": [
+      {
+        "band": ">=0.98",
+        "magnetic": 155,
+        "precision": 0.9810126582278481,
+        "rows": 158
+      },
+      {
+        "band": "0.95-0.98",
+        "magnetic": 35,
+        "precision": 1.0,
+        "rows": 35
+      },
+      {
+        "band": "0.90-0.95",
+        "magnetic": 38,
+        "precision": 0.9743589743589743,
+        "rows": 39
+      },
+      {
+        "band": "0.50-0.90",
+        "magnetic": 239,
+        "precision": 0.8327526132404182,
+        "rows": 287
+      }
+    ],
+    "confusion_matrix": {
+      "fn": 116,
+      "fp": 131,
+      "tn": 1820,
+      "tp": 537
+    },
+    "f1_score": 0.8130204390613172,
+    "precision": 0.8038922155688623,
+    "recall": 0.8223583460949464,
+    "roc_auc": 0.945631211229487
+  },
+  "test_metrics_by_source": {
+    "C2DB": {
+      "accuracy": 0.9051459293394777,
+      "band_precision": [
+        {
+          "band": ">=0.98",
+          "magnetic": 155,
+          "precision": 0.9810126582278481,
+          "rows": 158
+        },
+        {
+          "band": "0.95-0.98",
+          "magnetic": 35,
+          "precision": 1.0,
+          "rows": 35
+        },
+        {
+          "band": "0.90-0.95",
+          "magnetic": 38,
+          "precision": 0.9743589743589743,
+          "rows": 39
+        },
+        {
+          "band": "0.50-0.90",
+          "magnetic": 239,
+          "precision": 0.8327526132404182,
+          "rows": 287
+        }
+      ],
+      "confusion_matrix": {
+        "fn": 116,
+        "fp": 131,
+        "tn": 1820,
+        "tp": 537
+      },
+      "f1_score": 0.8130204390613172,
+      "precision": 0.8038922155688623,
+      "recall": 0.8223583460949464,
+      "roc_auc": 0.945631211229487,
+      "rows": 2604
+    }
+  },
+  "threshold": 0.4107142857142857,
+  "threshold_selection": {
+    "constraint_status": "not_met_fallback_to_max_f1",
+    "minimum_precision": 0.8,
+    "selected_on": "validation_split",
+    "target_recall": 0.9,
+    "validation_f1": 0.7919463087248322,
+    "validation_precision": 0.7988394584139265,
+    "validation_recall": 0.785171102661597
+  }
+}

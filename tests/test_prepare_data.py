@@ -84,6 +84,48 @@ def test_process_c2db_labels_by_total_moment(prepare_module, tmp_path):
     assert stats["output_compositions"] == 3
 
 
+def test_process_c2db_lowest_hull_uses_the_is_magnetic_key_without_a_moment(prepare_module, tmp_path):
+    source = tmp_path / "c2db_formulas.csv"
+    pd.DataFrame(
+        {
+            # CrI3: the lowest structure decides. MoS2: no moment, C2DB says non-magnetic.
+            # FeCl2: the lowest structure has no label, so the next one is used.
+            "formula_normalized": ["CrI3", "CrI3", "MoS2", "MoS2", "FeCl2", "FeCl2"],
+            "ehull": [0.2, 0.0, 0.0, 0.1, 0.0, 0.05],
+            "magmom": [0.0, 6.0, None, 2.0, None, 4.0],
+            "is_magnetic_key": [None, 1, 0, None, None, 1],
+            "source": "C2DB",
+        }
+    ).to_csv(source, index=False)
+
+    lowest, stats = prepare_module.process_c2db(source, structures="lowest-hull")
+    every, _ = prepare_module.process_c2db(source)
+
+    assert dict(zip(lowest["formula_normalized"], lowest["is_magnetic"])) == {"CrI3": 1, "FeCl2": 1, "MoS2": 0}
+    assert stats["lowest_hull_structure_unlabelled"] == 1
+    # With every structure, CrI3 and MoS2 have conflicting labels and are dropped.
+    assert every["formula_normalized"].tolist() == ["FeCl2"]
+
+
+def test_prepare_cli_c2db_only_keeps_v2db_formulas_as_known(prepare_module, tmp_path):
+    v2db = tmp_path / "v2db.csv"
+    pd.DataFrame(
+        {"Material": ["FeO"], "Magnetic_state": ["FM"], "Material_is_magnetic": [1]}
+    ).to_csv(v2db, index=False)
+    c2db = tmp_path / "c2db.csv"
+    pd.DataFrame({"formula_normalized": ["CrI3", "MoS2"], "magmom": [6.0, 0.0]}).to_csv(c2db, index=False)
+    output, known = tmp_path / "out.csv", tmp_path / "known.txt"
+
+    exit_code = prepare_module.main(
+        ["--input", str(v2db), "--c2db", str(c2db), "--c2db-only", "--output", str(output),
+         "--known-output", str(known)]
+    )
+
+    assert exit_code == 0
+    assert set(pd.read_csv(output)["source"]) == {"C2DB"}
+    assert known.read_text().split() == ["CrI3", "FeO", "MoS2"]
+
+
 def test_combine_sources_keeps_the_c2db_label(prepare_module):
     columns = ["formula_normalized", "is_magnetic", "source", "record_count", "prototype_count"]
     v2db = pd.DataFrame(

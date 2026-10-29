@@ -51,13 +51,16 @@ structures). Output: `results/c2db_audit/summary.json`.
   own class, which the net-moment target counts as 0. FM versus AFM has to come from DFT.
 - The table keeps one structure per formula, but not the lowest-hull one. Of 1,892 formulas with several
   structures, it kept the lowest in 321 and the highest in 1,246 (CrI3: the 0.197 eV/atom structure, not the
-  0.000 one). The label differs from the lowest-hull structure for 112 of 11,556 formulas (1.0%). `ehull` and
+  0.000 one). The label differs from the lowest-hull structure for 184 of 13,251 formulas (1.4%). `ehull` and
   `hform` from this table are not used anywhere in the pipeline.
+- Structures without a stored moment are non-spin-polarized calculations: C2DB's own `is_magnetic` key is 0 for
+  3,060 of the 3,061. The table writes a moment of 0 for them, which gives the right label.
 
 ## Mn diagnosis (2026-10-29)
 
 Nine of the first main 10 contain Mn. The numbers below come from a one-off diagnosis on the C2DB part of the v3
-test split (2,604 compositions, DFT labels). The C2DB-only model becomes v4.
+test split (2,604 compositions, DFT labels from the thesis table). The C2DB-only model becomes v4. Reproducible numbers on the same test
+formulas, from the pipeline itself: `results/v4/README.md`.
 
 - **The Mn preference is in the C2DB label.** 95.4% of the 175 Mn compositions are magnetic, against 61.4% of the
   533 with Cr, Fe, Co, V or Ni but no Mn, and 7.7% of the 1,678 with none of these metals, Cu or Ti. In the whole release
@@ -67,7 +70,7 @@ test split (2,604 compositions, DFT labels). The C2DB-only model becomes v4.
   | Model | ROC-AUC | Precision | Recall | F1 |
   | --- | --- | --- | --- | --- |
   | v3 (C2DB + V2DB, threshold 0.667) | 0.893 | 0.853 | 0.596 | 0.702 |
-  | C2DB only (threshold 0.41) | 0.939 | 0.822 | 0.788 | 0.805 |
+  | C2DB only (threshold 0.41; run outside the Docker image, 0.936 inside it) | 0.939 | 0.822 | 0.788 | 0.805 |
   | Rule: contains Mn, Cr, Fe, Co, V or Ni | 0.819 | 0.698 | 0.747 | 0.722 |
 
 - **The top of the ranking is flat.** 203 of the 208 candidates that pass S1-S9 sit on three calibrated score

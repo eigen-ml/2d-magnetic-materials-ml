@@ -63,7 +63,7 @@ def test_audit_finds_the_release_and_the_kept_polymorph(audit_module, tables):
     kept = summary["thesis_table"]["kept_polymorph"]
     assert (kept["formulas"], kept["lowest_hull"], kept["highest_hull"]) == (1, 0, 1)
     assert summary["db"]["rows_with_antiparallel_site_moments"] == 1
-    assert summary["label_agreement_lowest_hull_polymorph"]["thesis_vs_db_magmom"] == {
+    assert summary["label_agreement_lowest_hull_polymorph"]["thesis_vs_db_label"] == {
         "thesis0_db0": 2, "thesis0_db1": 0, "thesis1_db0": 0, "thesis1_db1": 2,
     }
     mnps3 = summary["known_magnets"]["MnPS3"]["db"]

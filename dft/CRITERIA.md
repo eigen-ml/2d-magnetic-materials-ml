@@ -90,7 +90,7 @@ kept unchanged. Ata decided these three changes after reviewing it:
    batch 1 result is reported, failures included. Reason: relax and phonon judge each structure on its own, so a
    biased ranking changes which candidates get computed, not whether a computed one is stable. Cost: batch 1
    says little about how well the model ranks non-Mn compounds.
-   *Correction, 2026-10-30:* "C2DB does not show the gap" was wrong. On the C2DB test rows, 95% of the Mn
+   *Correction, 2026-10-30:* "C2DB does not show the gap" was wrong. On the C2DB test rows (thesis-table labels), 95% of the Mn
    compositions are magnetic (Cr 86%, Fe 86%, V 64%, Co 56%, Ni 41%), so the preference comes from the C2DB
    label itself. V2DB mainly pushes Cr down. Batch 1 stays as fixed above. Diagnosis: `results/v3/README.md`.
 
@@ -102,9 +102,10 @@ kept unchanged. Ata decided these three changes after reviewing it:
    model separates low from high scores, and whether the DFT protocol finds an AFM ground state where there is
    one. The list is fixed in `dft/selection.json` before any calculation of the group, and every result is
    reported.
-7. **Main model and batch 2.** v4, trained on the C2DB rows only (DFT labels), is the main model. On the C2DB
-   test rows it reaches ROC-AUC 0.939 against 0.893 for v3. Batch 2 comes from v4 with the same filters and at
-   most 3 compositions per magnetic metal. v3 and the metal rule are reported next to it.
+7. **Main model and batch 2.** v4, trained on C2DB only (DFT labels, lowest-hull structure per formula), is the
+   main model. On the 2,604 C2DB test formulas it reaches ROC-AUC 0.946 against 0.900 for v3
+   (`results/v4/README.md`). Batch 2 comes from v4 with the same filters and at most 3 compositions per magnetic
+   metal. v3 and the metal rule are reported next to it.
 8. **S5 reference.** The thesis table and the C2DB file from 2025-07-08 have the same formula set, so S5 keeps
    the thesis table as its default and batch 1 does not change. A newer C2DB release goes through
    `scripts/09_c2db_audit.py` first.

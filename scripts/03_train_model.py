@@ -138,6 +138,44 @@ def split_dataset(
     return X_train, X_validation, X_test, y_train, y_validation, y_test
 
 
+PARTITIONS = ("train", "validation", "test")
+
+
+def reference_partition(reference: pd.DataFrame) -> dict[str, tuple[str, int]]:
+    """Map each formula to its partition in ``reference`` and its row position there."""
+    feature_df, valid_indices = featurize_dataset(reference)
+    X_train, X_validation, X_test, *_ = split_dataset(feature_df)
+    formulas = reference.loc[valid_indices, "formula_normalized"].to_numpy()
+    partition: dict[str, tuple[str, int]] = {}
+    for name, part in zip(PARTITIONS, (X_train, X_validation, X_test)):
+        partition.update({formulas[index]: (name, rank) for rank, index in enumerate(part.index)})
+    return partition
+
+
+def split_like(
+    feature_df: pd.DataFrame,
+    formulas: pd.Series,
+    partition: dict[str, tuple[str, int]],
+) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.Series, pd.Series, pd.Series]:
+    """Split by a reference partition, so that models trained on different data
+    (e.g. C2DB only and C2DB + V2DB) are tested on the same formulas.
+
+    Rows keep the reference order: the boosting subsample picks rows by position,
+    so the order changes the fitted model.
+    """
+    missing = formulas.loc[~formulas.isin(partition)]
+    if len(missing):
+        raise TrainingDataError(
+            f"{len(missing)} formula(s) are not in the reference split, e.g. {missing.iloc[0]}"
+        )
+    name = formulas.map(lambda formula: partition[formula][0])
+    rank = formulas.map(lambda formula: partition[formula][1])
+    y = feature_df["is_magnetic"].astype(int)
+    X = feature_df.drop(columns="is_magnetic")
+    order = [rank.loc[name == part].sort_values().index for part in PARTITIONS]
+    return (*(X.loc[index] for index in order), *(y.loc[index] for index in order))
+
+
 def train_model(
     X_train: pd.DataFrame,
     y_train: pd.Series,
@@ -373,6 +411,12 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="keep raw boosting scores instead of isotonic-calibrated ones",
     )
+    parser.add_argument(
+        "--split-like",
+        type=Path,
+        help="prepared dataset whose standard split decides each formula's partition",
+    )
+    parser.add_argument("--model-version", default="v3.1_composition_only")
     parser.add_argument("--verbose", action="store_true")
     return parser
 
@@ -408,9 +452,18 @@ def main(argv: list[str] | None = None) -> int:
             for source in sorted(sources.unique())
         }
         feature_df = select_features(feature_df, args.feature_set)
-        X_train, X_validation, X_test, y_train, y_validation, y_test = split_dataset(
-            feature_df
-        )
+        if args.split_like is None:
+            X_train, X_validation, X_test, y_train, y_validation, y_test = split_dataset(
+                feature_df
+            )
+        else:
+            formulas = pd.Series(
+                raw.loc[valid_indices, "formula_normalized"].to_numpy(), index=feature_df.index
+            )
+            partition = reference_partition(pd.read_csv(args.split_like))
+            X_train, X_validation, X_test, y_train, y_validation, y_test = split_like(
+                feature_df, formulas, partition
+            )
         source_weights = np.where(sources.loc[X_train.index] == "C2DB", args.c2db_weight, 1.0)
         classifier, weighting = train_model(
             X_train,
@@ -440,7 +493,7 @@ def main(argv: list[str] | None = None) -> int:
     full_counts = Counter(int(value) for value in feature_df["is_magnetic"])
     metadata: dict[str, Any] = {
         "schema_version": 1,
-        "model_version": "v3.1_composition_only",
+        "model_version": args.model_version,
         "scientific_scope": {
             "input": "reduced chemical composition only",
             "target": f"is_magnetic column of {args.data.name}",
@@ -461,6 +514,10 @@ def main(argv: list[str] | None = None) -> int:
         },
         "split": {
             "random_state": RANDOM_STATE,
+            "like": None if args.split_like is None else {
+                "file": args.split_like.name,
+                "sha256": sha256_file(args.split_like),
+            },
             "train_rows": int(len(X_train)),
             "validation_rows": int(len(X_validation)),
             "test_rows": int(len(X_test)),
