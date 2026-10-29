@@ -160,23 +160,27 @@ def test_select_groups_caps_each_metal_and_skips_an_earlier_batch(filter_module)
     ]
 
 
-def test_select_control_takes_low_scores_and_spreads_the_metals(filter_module):
-    def row(formula, family, cations, score, **failed):
-        return {**_passing_row(formula, family, cations, score), "magnetic_score": score, **failed}
+def test_select_control_takes_low_scores_with_plausible_oxidation_states(filter_module):
+    def row(formula, family, cations, score, likelihood=0.4, **failed):
+        return {
+            **_passing_row(formula, family, cations, score),
+            "magnetic_score": score, "oxidation_likelihood": likelihood, **failed,
+        }
 
     table = pd.DataFrame(
         [
-            row("Ti2NiTe4", "F1", "Ni+Ti", 0.10),
-            row("Ta2NiS4", "F1", "Ni+Ta", 0.12),  # same family
-            row("NiZrS3", "F2", "Ni+Zr", 0.13),  # Ni already used
-            row("CoTe2Se", "F3", "Co", 0.15, S9=False),  # far above the hull
-            row("Cr2WSe4", "F1", "Cr+W", 0.20),  # same family
-            row("VWSe3", "F4", "V+W", 0.25, S5=False, S6=False),  # need not be new
+            row("TaNi2Te4", "F1", "Ni+Ta", 0.01, likelihood=0.03),  # rare states
+            row("ZrNi2Te4", "F1", "Ni+Zr", 0.02),
+            row("HfNi2Te4", "F1", "Hf+Ni", 0.03),  # same family
+            row("ZrNi2Se4", "F2", "Ni+Zr", 0.04),  # same cation set
+            row("CoTe2Se", "F3", "Co", 0.05, S9=False),  # far above the hull
+            row("HfNi2S4", "F4", "Hf+Ni", 0.10, S5=False, S6=False),  # need not be new
         ]
     )
     picked = filter_module.select_control(table, size=4)
-    assert picked.loc[picked["group"] == "control", "formula"].tolist() == ["Ti2NiTe4", "VWSe3"]
-    assert picked.set_index("formula").loc["CoTe2Se", "first_failure"] == "S9"
+    assert picked.loc[picked["group"] == "control", "formula"].tolist() == ["ZrNi2Te4", "HfNi2S4"]
+    failures = picked.set_index("formula")["first_failure"]
+    assert (failures["TaNi2Te4"], failures["CoTe2Se"]) == ("likelihood", "S9")
 
 
 def test_s9_fails_only_far_above_the_hull(filter_module):

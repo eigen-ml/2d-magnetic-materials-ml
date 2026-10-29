@@ -44,14 +44,17 @@ MAIN_SIZE = 10
 THESIS_TOP = 10
 REFERENCES = ("CrI3", "VCl3")
 HULL_MAX = 0.1  # eV/atom, S9
-# Batch 2 and the control group (CRITERIA amendment, items 6-7).
+# Batch 2 and the control group (CRITERIA amendment, items 6, 7 and 9).
 MAGNETIC_METALS = ("V", "Cr", "Mn", "Fe", "Co", "Ni")
 CONTROL_MAX_SCORE = 0.3
 CONTROL_SIZE = 4
 CONTROL_FIXED = ("MnBr2",)  # AFM monolayer in the literature, FM state in C2DB
 # The control does not have to be new; it has to be in distribution, charge
-# balanced, buildable and near the bulk hull.
+# balanced, buildable as a 2D sheet and near the bulk hull.
 CONTROL_FILTERS = ("S2", "S3", "S4", "S8", "S9")
+# Oxidation-state likelihood (S3's ICSD product) a control needs; rare states such as
+# W+2 or Zr+3 make a DFT result say little about the model.
+CONTROL_MIN_LIKELIHOOD = 0.05
 # An oxidation state is allowed when it makes up at least this share of the element's
 # non-zero ICSD (2024) entries; Co+1, for example, is 0.8% of cobalt's.
 OXIDATION_SHARE_MIN = 0.01
@@ -599,28 +602,27 @@ def select_groups(
 
 
 def select_control(table: pd.DataFrame, size: int = CONTROL_SIZE) -> pd.DataFrame:
-    """Pick the control group: lowest scores first, passing CONTROL_FILTERS, and at most one
-    per family, cation set and magnetic metal, so that the few picks cover different metals."""
+    """Pick the control group: lowest scores first, passing CONTROL_FILTERS with an oxidation
+    likelihood of at least CONTROL_MIN_LIKELIHOOD, and at most one per family and cation set."""
     table = table.sort_values(
         ["magnetic_score", "raw_score", "formula"], ascending=[True, True, True]
     ).copy()
     table["first_failure"] = table.apply(first_failure, axis=1, filters=CONTROL_FILTERS)
+    rare = (table["first_failure"] == "pass") & (table["oxidation_likelihood"] < CONTROL_MIN_LIKELIHOOD)
+    table.loc[rare, "first_failure"] = "likelihood"
     table["S7"] = pd.NA
     table["group"] = ""
     families: set[str] = set()
     cations: set[str] = set()
-    metals_used: set[str] = set()
     for index, row in table.iterrows():
         if row["first_failure"] != "pass" or (table["group"] == "control").sum() >= size:
             continue
-        metals = magnetic_metals(row["formula"])
-        if row["family"] in families or row["cation_set"] in cations or metals & metals_used:
+        if row["family"] in families or row["cation_set"] in cations:
             table.at[index, "S7"] = False
             continue
         table.at[index, "S7"] = True
         families.add(row["family"])
         cations.add(row["cation_set"])
-        metals_used |= metals
         table.at[index, "group"] = "control"
     return table
 
@@ -741,7 +743,8 @@ def main(argv: list[str] | None = None) -> int:
         evaluated = control.loc[control["S2"].astype(bool) & control["S3"].astype(bool) & control["S4"].astype(bool)]
         summary["control"] = {
             "rule": f"score < {CONTROL_MAX_SCORE}, contains {'/'.join(MAGNETIC_METALS)}, passes "
-            f"{', '.join(CONTROL_FILTERS)}; lowest score first, one per family, cation set and metal",
+            f"{', '.join(CONTROL_FILTERS)}, oxidation likelihood >= {CONTROL_MIN_LIKELIHOOD}; "
+            "lowest score first, one per family and cation set",
             "pool": int(len(control)),
             "pool_passing_S2_S4": int(len(evaluated)),
             "pool_passing_all": int((control["first_failure"] == "pass").sum()),

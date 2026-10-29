@@ -4,14 +4,15 @@
       "MnBr2"
     ],
     "picked": [
-      "TaNi2Te4",
-      "VW2O4",
-      "Zr2FeSe4"
+      "ZrNi2Te4",
+      "CuNi2Se4",
+      "HfNi2S4",
+      "NiPdSe3"
     ],
     "pool": 98,
     "pool_passing_S2_S4": 76,
-    "pool_passing_all": 53,
-    "rule": "score < 0.3, contains V/Cr/Mn/Fe/Co/Ni, passes S2, S3, S4, S8, S9; lowest score first, one per family, cation set and metal"
+    "pool_passing_all": 16,
+    "rule": "score < 0.3, contains V/Cr/Mn/Fe/Co/Ni, passes S2, S3, S4, S8, S9, oxidation likelihood >= 0.05; lowest score first, one per family and cation set"
   },
   "criteria": "dft/CRITERIA.md",
   "excluded_earlier_batch": [
@@ -43,14 +44,15 @@
     "MnCrBr4",
     "Mn2CrSe4",
     "Mn2VTe4",
+    "MnRuO3",
     "CrNiI4",
-    "FeCoO3",
+    "CrFeO3",
     "FeCoS3",
     "VFe2Se4",
-    "VNiI4",
-    "CoNi2I4"
+    "VFeSe3",
+    "VNiI4"
   ],
-  "metal_cap": 3,
+  "metal_cap": 4,
   "optimade_providers_answered": {
     "alexandria": true,
     "jarvis": true,

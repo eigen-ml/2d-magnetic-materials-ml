@@ -100,12 +100,28 @@ kept unchanged. Ata decided these three changes after reviewing it:
    MnBr2. MnBr2 is an antiferromagnetic monolayer in the literature, but C2DB stores it in the FM state with
    5.0 μB. The group gets relax and the NM/FM/AFM comparison, no phonons. It measures two things: whether the
    model separates low from high scores, and whether the DFT protocol finds an AFM ground state where there is
-   one. The list is fixed in `dft/selection.json` before any calculation of the group, and every result is
-   reported.
+   one. The list is fixed in `dft/batch2/selection.json` before any calculation of the group (item 9), and every
+   result is reported.
 7. **Main model and batch 2.** v4, trained on C2DB only (DFT labels, lowest-hull structure per formula), is the
    main model. On the 2,604 C2DB test formulas it reaches ROC-AUC 0.946 against 0.900 for v3
    (`results/v4/README.md`). Batch 2 comes from v4 with the same filters and at most 3 compositions per magnetic
-   metal. v3 and the metal rule are reported next to it.
+   metal (4 since item 9). v3 and the metal rule are reported next to it.
 8. **S5 reference.** The thesis table and the C2DB file from 2025-07-08 have the same formula set, so S5 keeps
    the thesis table as its default and batch 1 does not change. A newer C2DB release goes through
    `scripts/09_c2db_audit.py` first.
+
+**2026-10-30, after the first batch 2 run and before any DFT calculation.** The first run (checkpoint A) is
+kept unchanged in `dft/batch2/checkpoint-A/`. Ata decided:
+
+9. **Batch 2 and control rules in detail.**
+   - Batch 2: v4 screening. S2 counts templates among the v4 training compositions (C2DB only). Batch 1 formulas
+     are skipped. At most 4 compositions per magnetic metal (V, Cr, Mn, Fe, Co, Ni). With 3, only 9 fit,
+     because every candidate holds two magnetic metals.
+   - Control: v4 score below 0.3, contains one of those metals, and passes S2, S3, S4, S8 and S9 (S5 and S6 are
+     not required). The most likely oxidation-state assignment needs an ICSD likelihood of at least 0.05: the
+     first run picked VW2O4 and Zr2FeSe4, which need W+2 and Zr+3. Lowest score first, one per family and cation
+     set, 4 picks, plus MnBr2. The low-score pool is almost all Ni compounds, so the control tests the model
+     mainly on Ni.
+   - Everything stays 2D. A composition needs a same-stoichiometry 2D prototype (S8), and DFT is done on the
+     monolayer. Bulk data (S9, `bulk_known`) is information only.
+   - The lists are in `dft/batch2/selection.json` and are fixed from here on.
