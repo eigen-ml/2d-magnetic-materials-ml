@@ -40,3 +40,8 @@ def discover_module() -> ModuleType:
 @pytest.fixture(scope="session")
 def filter_module() -> ModuleType:
     return load_script("06_filter_candidates.py")
+
+
+@pytest.fixture(scope="session")
+def audit_module() -> ModuleType:
+    return load_script("09_c2db_audit.py")

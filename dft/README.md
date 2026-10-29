@@ -56,10 +56,19 @@ are in `selection.json`.
 2. Stage P: build structures from same-stoichiometry 2D prototypes, relax them with an ML potential to pick the
    prototype, and write POSCARs with 20 Å vacuum. Ata and Yeşim Hoca look at them in VESTA before anything goes
    to TRUBA.
+3. Settings, fixed on 2026-10-30:
+   - **Hubbard U:** the values C2DB uses, so that DFT and the training label agree. They still have to be checked
+     against Haastrup et al. 2018. Literature U values may come later as a sensitivity check.
+   - **ENCUT:** 1.3 × the largest ENMAX among the material's POTCARs, the lower limit the VASP wiki recommends
+     for volume relaxation. The same value is used in every step of one material (relax, NM/FM/AFM, phonons), so
+     the energies are comparable. There is no convergence scan per candidate. On CrI3, 1.3× is compared once
+     with 1.5×.
+   - **Phonons:** phonopy finite displacements. VASP's DFPT (IBRION=7/8) does not support +U.
 
 ## Caveats
 
-- Mn is in 9 of the 10, and A2BX4 in 6. This is the model's preference, after the filters.
+- Mn is in 9 of the 10, and A2BX4 in 6. This is the model's preference, after the filters. It comes from the
+  C2DB label, where 95% of Mn compositions are magnetic (`results/v3/README.md`).
 - Element-level ICSD counts ignore the anion: Mn+3 is common in oxides, less so in chalcogenides and halides.
 - A composition near the bulk hull says nothing yet about its monolayer. The relax and phonon calculations
   answer that.

@@ -2,10 +2,14 @@
 """Prepare composition-level magnetic labels from V2DB and, optionally, C2DB.
 
 Two targets are supported. ``net_moment`` (default) marks a composition as
-magnetic when it carries a net moment (FM or ferrimagnetic). It is the only
-definition both sources share: the C2DB rows hold the total cell moment, so
-an antiferromagnet with zero net moment cannot be told apart from a
-non-magnet. ``any_magnetic`` is the thesis target (V2DB FM or AFM).
+magnetic when it carries a net moment (V2DB ``FM``, C2DB total cell moment
+above 0.1). ``any_magnetic`` is the thesis target (V2DB FM or AFM).
+
+The two sources do not mean quite the same thing by a net moment. C2DB keeps
+magnetic materials in their ferromagnetic state, so a C2DB row with a moment
+means "spin-polarized when ordered ferromagnetically", not "ferromagnetic
+ground state". Known antiferromagnets such as MnPS3 and MnBr2 carry their
+FM-state moment and are labelled 1 (see scripts/09_c2db_audit.py).
 """
 
 from __future__ import annotations
@@ -173,7 +177,8 @@ def process_c2db(filepath: str | Path) -> tuple[pd.DataFrame, dict[str, int]]:
     """Load C2DB rows (formula + total moment) and label them by net moment.
 
     Accepts the thesis hybrid table, where C2DB rows are marked ``source=C2DB``,
-    or any table with ``formula_normalized`` and ``magmom`` columns.
+    or any table with ``formula_normalized`` and ``magmom`` columns. The moment
+    is that of the stored FM state, see the module docstring.
     """
     source = Path(filepath)
     if not source.is_file():
@@ -300,8 +305,9 @@ def main(argv: list[str] | None = None) -> int:
     if c2db is not None:
         if args.target == TARGET_ANY_MAGNETIC:
             print(
-                "WARNING: C2DB labels are net-moment labels; AFM C2DB entries count as "
-                "non-magnetic under the any_magnetic target.",
+                "WARNING: C2DB labels are FM-state moments, not ground states; a C2DB "
+                "antiferromagnet usually counts as magnetic and a zero-moment row as "
+                "non-magnetic under any target.",
                 file=sys.stderr,
             )
         print(f"C2DB compositions: {c2db_stats['output_compositions']:,}")

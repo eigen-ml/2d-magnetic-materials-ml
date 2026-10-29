@@ -3,3 +3,5 @@
 matminer>=0.9,<1
 jarvis-tools>=2024.5
 smact==4.0.2
+# C2DB is an ASE database (scripts/09_c2db_audit.py)
+ase>=3.23

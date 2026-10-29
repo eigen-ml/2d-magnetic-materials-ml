@@ -31,6 +31,17 @@ The following files came from an older C2DB+V2DB workflow even though the previo
 
 The exact source package/version and license notice for the extracted C2DB subset were not stored in this Git history. The current Computational Materials Repository states that its databases use CC BY-SA 4.0, but this audit cannot determine which terms accompanied the older local extraction. Review the source and its historical terms before redistribution. The repository's MIT license does not override them.
 
+### C2DB source (checked 2026-10-30)
+
+- The C2DB rows above match the C2DB file `c2db.db` (ASE database, 16,905 structures), downloaded on 2026-10-30
+  from `https://wiki.fysik.dtu.dk/c2db.db` (Last-Modified 2025-07-08, SHA-256
+  `a1a96ebc00c27dafecd7be8a1ebf7f2cbdedc8160626a674855d22ff466aef2d`). All 13,251 formulas and their `ehull`
+  values are in it. The file is not tracked. `scripts/09_c2db_audit.py` reads it and writes
+  `data/external/c2db_formulas.csv` (not tracked) and `results/c2db_audit/summary.json` (tracked, counts only).
+- The C2DB website (c2db.fysik.dtu.dk) shows CC BY-NC 4.0. That differs from the CC BY-SA 4.0 noted above for
+  CMR. Neither is covered by the repository's MIT license, so the C2DB data stays out of the repository.
+- C2DB reference: Haastrup et al., *2D Mater.* 5, 042002 (2018); Gjerding et al., *2D Mater.* 8, 044002 (2021).
+
 The archived `model.joblib` was not deserialized during this audit because joblib uses pickle and loading an untrusted pickle can execute code. Its SHA-256 is `ab46708fe870bdb1a99ed8ee458002b58dfb751bdf7a50fd69cb6b2b182b1e35`.
 
 ## Current artefacts (2026-09-30)
