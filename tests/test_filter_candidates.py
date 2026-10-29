@@ -143,6 +143,42 @@ def test_select_groups_caps_each_family_and_cation_set(filter_module):
     assert table.set_index("formula").loc["G", "first_failure"] == "S6"
 
 
+def test_select_groups_caps_each_metal_and_skips_an_earlier_batch(filter_module):
+    rows = [
+        _passing_row("Mn2VSe4", "F1", "Mn+V", 0.99),  # in the earlier batch
+        _passing_row("MnCrS3", "F2", "Cr+Mn", 0.98),
+        _passing_row("MnFeS3", "F2", "Fe+Mn", 0.97),
+        _passing_row("Mn2CoO4", "F3", "Co+Mn", 0.96),
+        _passing_row("MnNiCl3", "F4", "Mn+Ni", 0.95),  # fourth Mn
+        _passing_row("CrFeO3", "F5", "Cr+Fe", 0.94),
+    ]
+    table = filter_module.select_groups(pd.DataFrame(rows), metal_cap=3, exclude=["Mn2VSe4"])
+    groups = dict(zip(table["formula"], table["group"]))
+    assert groups["Mn2VSe4"] == "earlier_batch"
+    assert [r["formula"] for r in rows if groups[r["formula"]] == "main"] == [
+        "MnCrS3", "MnFeS3", "Mn2CoO4", "CrFeO3",
+    ]
+
+
+def test_select_control_takes_low_scores_and_spreads_the_metals(filter_module):
+    def row(formula, family, cations, score, **failed):
+        return {**_passing_row(formula, family, cations, score), "magnetic_score": score, **failed}
+
+    table = pd.DataFrame(
+        [
+            row("Ti2NiTe4", "F1", "Ni+Ti", 0.10),
+            row("Ta2NiS4", "F1", "Ni+Ta", 0.12),  # same family
+            row("NiZrS3", "F2", "Ni+Zr", 0.13),  # Ni already used
+            row("CoTe2Se", "F3", "Co", 0.15, S9=False),  # far above the hull
+            row("Cr2WSe4", "F1", "Cr+W", 0.20),  # same family
+            row("VWSe3", "F4", "V+W", 0.25, S5=False, S6=False),  # need not be new
+        ]
+    )
+    picked = filter_module.select_control(table, size=4)
+    assert picked.loc[picked["group"] == "control", "formula"].tolist() == ["Ti2NiTe4", "VWSe3"]
+    assert picked.set_index("formula").loc["CoTe2Se", "first_failure"] == "S9"
+
+
 def test_s9_fails_only_far_above_the_hull(filter_module):
     row = _passing_row("X", "F1", "Mn+V", 0.9)
     assert filter_module.first_failure(pd.Series(row)) == "pass"

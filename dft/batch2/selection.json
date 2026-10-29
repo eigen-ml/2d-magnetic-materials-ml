@@ -1,0 +1,78 @@
+{
+  "control": {
+    "fixed": [
+      "MnBr2"
+    ],
+    "picked": [
+      "TaNi2Te4",
+      "VW2O4",
+      "Zr2FeSe4"
+    ],
+    "pool": 98,
+    "pool_passing_S2_S4": 76,
+    "pool_passing_all": 53,
+    "rule": "score < 0.3, contains V/Cr/Mn/Fe/Co/Ni, passes S2, S3, S4, S8, S9; lowest score first, one per family, cation set and metal"
+  },
+  "criteria": "dft/CRITERIA.md",
+  "excluded_earlier_batch": [
+    "CrCoSe3",
+    "CrI3",
+    "Mn2CoSe4",
+    "Mn2CoTe4",
+    "Mn2CrS4",
+    "Mn2CrTe4",
+    "Mn2VS4",
+    "Mn2VSe4",
+    "MnBr2Cl",
+    "MnBrCl2",
+    "MnFeS3",
+    "VCl3"
+  ],
+  "funnel": {
+    "after_S1": 564,
+    "after_S2": 564,
+    "after_S3": 328,
+    "after_S4": 323,
+    "after_S5": 321,
+    "after_S6": 311,
+    "after_S8": 311,
+    "after_S9": 188,
+    "screened": 2172
+  },
+  "main": [
+    "MnCrBr4",
+    "Mn2CrSe4",
+    "Mn2VTe4",
+    "CrNiI4",
+    "FeCoO3",
+    "FeCoS3",
+    "VFe2Se4",
+    "VNiI4",
+    "CoNi2I4"
+  ],
+  "metal_cap": 3,
+  "optimade_providers_answered": {
+    "alexandria": true,
+    "jarvis": true,
+    "mc2d": true,
+    "mp": true,
+    "twodmatpedia": true
+  },
+  "reference": [
+    "CrI3",
+    "VCl3"
+  ],
+  "run_date_utc": "2026-10-29",
+  "thesis_top10_first_failure": {
+    "Fe2CoCl4": "S3",
+    "Mn2CoCl4": "S3",
+    "Mn2CrBr4": "S3",
+    "Mn2CrCl4": "S3",
+    "Mn2CrF4": "S3",
+    "Mn2CrI4": "S3",
+    "Mn2CrO4": "pass",
+    "Mn2FeCl4": "S3",
+    "Mn2FeI4": "S3",
+    "Mn2FeO4": "S6"
+  }
+}

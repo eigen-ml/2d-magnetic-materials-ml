@@ -44,6 +44,14 @@ MAIN_SIZE = 10
 THESIS_TOP = 10
 REFERENCES = ("CrI3", "VCl3")
 HULL_MAX = 0.1  # eV/atom, S9
+# Batch 2 and the control group (CRITERIA amendment, items 6-7).
+MAGNETIC_METALS = ("V", "Cr", "Mn", "Fe", "Co", "Ni")
+CONTROL_MAX_SCORE = 0.3
+CONTROL_SIZE = 4
+CONTROL_FIXED = ("MnBr2",)  # AFM monolayer in the literature, FM state in C2DB
+# The control does not have to be new; it has to be in distribution, charge
+# balanced, buildable and near the bulk hull.
+CONTROL_FILTERS = ("S2", "S3", "S4", "S8", "S9")
 # An oxidation state is allowed when it makes up at least this share of the element's
 # non-zero ICSD (2024) entries; Co+1, for example, is 0.8% of cobalt's.
 OXIDATION_SHARE_MIN = 0.01
@@ -531,9 +539,9 @@ def network_filters(
     return table, provider_ok
 
 
-def first_failure(row: pd.Series) -> str:
+def first_failure(row: pd.Series, filters: Sequence[str] = FILTERS) -> str:
     """The first filter the row fails, 'not evaluated' if it stops there, or 'pass'."""
-    for name in FILTERS:
+    for name in filters:
         value = row.get(name)
         if value is pd.NA or value is None or (isinstance(value, float) and pd.isna(value)):
             return "not evaluated"
@@ -542,28 +550,78 @@ def first_failure(row: pd.Series) -> str:
     return "pass"
 
 
-def select_groups(table: pd.DataFrame) -> pd.DataFrame:
-    """Pick the main 10, at most FAMILY_LIMIT per family and CATION_SET_LIMIT per cation set (S7)."""
+def magnetic_metals(formula: str) -> set[str]:
+    return set(MAGNETIC_METALS) & set(Composition(formula).as_dict())
+
+
+def select_groups(
+    table: pd.DataFrame,
+    metal_cap: int | None = None,
+    exclude: Iterable[str] = (),
+) -> pd.DataFrame:
+    """Pick the main 10, at most FAMILY_LIMIT per family and CATION_SET_LIMIT per cation set (S7).
+
+    ``metal_cap`` also limits how many of the 10 contain each magnetic metal (batch 2).
+    Formulas in ``exclude`` (an earlier batch) are marked and skipped.
+    """
     table = table.sort_values(
         ["magnetic_score", "raw_score", "formula"], ascending=[False, False, True]
     ).copy()
     table["first_failure"] = table.apply(first_failure, axis=1)
     table["S7"] = pd.NA
     table["group"] = ""
+    excluded = {Composition(f).reduced_formula for f in exclude}
     per_family: Counter = Counter()
     per_cations: Counter = Counter()
+    per_metal: Counter = Counter()
     main = 0
     for index, row in table.iterrows():
         if row["first_failure"] != "pass" or main >= MAIN_SIZE:
             continue
-        if per_family[row["family"]] >= FAMILY_LIMIT or per_cations[row["cation_set"]] >= CATION_SET_LIMIT:
+        if excluded and Composition(row["formula"]).reduced_formula in excluded:
+            table.at[index, "group"] = "earlier_batch"
+            continue
+        metals = magnetic_metals(row["formula"]) if metal_cap is not None else set()
+        if (
+            per_family[row["family"]] >= FAMILY_LIMIT
+            or per_cations[row["cation_set"]] >= CATION_SET_LIMIT
+            or (metal_cap is not None and any(per_metal[m] >= metal_cap for m in metals))
+        ):
             table.at[index, "S7"] = False
             continue
         table.at[index, "S7"] = True
         per_family[row["family"]] += 1
         per_cations[row["cation_set"]] += 1
+        per_metal.update(metals)
         table.at[index, "group"] = "main"
         main += 1
+    return table
+
+
+def select_control(table: pd.DataFrame, size: int = CONTROL_SIZE) -> pd.DataFrame:
+    """Pick the control group: lowest scores first, passing CONTROL_FILTERS, and at most one
+    per family, cation set and magnetic metal, so that the few picks cover different metals."""
+    table = table.sort_values(
+        ["magnetic_score", "raw_score", "formula"], ascending=[True, True, True]
+    ).copy()
+    table["first_failure"] = table.apply(first_failure, axis=1, filters=CONTROL_FILTERS)
+    table["S7"] = pd.NA
+    table["group"] = ""
+    families: set[str] = set()
+    cations: set[str] = set()
+    metals_used: set[str] = set()
+    for index, row in table.iterrows():
+        if row["first_failure"] != "pass" or (table["group"] == "control").sum() >= size:
+            continue
+        metals = magnetic_metals(row["formula"])
+        if row["family"] in families or row["cation_set"] in cations or metals & metals_used:
+            table.at[index, "S7"] = False
+            continue
+        table.at[index, "S7"] = True
+        families.add(row["family"])
+        cations.add(row["cation_set"])
+        metals_used |= metals
+        table.at[index, "group"] = "control"
     return table
 
 
@@ -576,6 +634,17 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--thesis", type=Path, default=DEFAULT_THESIS)
     parser.add_argument("--output-dir", type=Path, default=DEFAULT_OUTPUT_DIR)
     parser.add_argument("--cache-dir", type=Path, default=DEFAULT_CACHE_DIR)
+    parser.add_argument("--metal-cap", type=int, help="at most this many of the main 10 per magnetic metal")
+    parser.add_argument(
+        "--exclude-selection",
+        type=Path,
+        help="selection.json of an earlier batch; its main and reference formulas are skipped",
+    )
+    parser.add_argument(
+        "--control-candidates",
+        type=Path,
+        help=f"all scores (04_discover.py --all-scores); picks a control group below {CONTROL_MAX_SCORE}",
+    )
     return parser
 
 
@@ -605,10 +674,24 @@ def main(argv: list[str] | None = None) -> int:
         missing = thesis.loc[~thesis["formula"].isin(candidates["formula"]), ["formula"]]
         thesis_rows = pd.concat([thesis_rows, missing.assign(magnetic_score=0.0, raw_score=0.0)])
         thesis_rows["list"] = "thesis_top10"
-        table = local_filters(pd.concat([candidates, thesis_rows], ignore_index=True), templates, c2db_formulas)
+        frames = [candidates, thesis_rows]
+        if args.control_candidates is not None:
+            scores = pd.read_csv(args.control_candidates)
+            frames.append(
+                scores.loc[
+                    (scores["magnetic_score"] < CONTROL_MAX_SCORE)
+                    & scores["formula"].map(lambda f: bool(magnetic_metals(f)))
+                ].assign(list="control_pool")
+            )
+        exclude: list[str] = []
+        if args.exclude_selection is not None:
+            earlier = json.loads(args.exclude_selection.read_text(encoding="utf-8"))
+            exclude = [*earlier["main"], *earlier["reference"]]
+        table = local_filters(pd.concat(frames, ignore_index=True), templates, c2db_formulas)
         table["_row"] = range(len(table))
         local_ok = table[["S1", "S2", "S3", "S4"]].all(axis=1)
-        evaluate = local_ok | (table["list"] == "thesis_top10")
+        control_ok = (table["list"] == "control_pool") & table[["S2", "S3", "S4"]].all(axis=1)
+        evaluate = local_ok | (table["list"] == "thesis_top10") | control_ok
         optimade = CachedClient(args.cache_dir / "optimade")
         openalex = CachedClient(args.cache_dir / "openalex", delay=0.15)
         arxiv = CachedClient(args.cache_dir / "arxiv", delay=3.0)
@@ -617,8 +700,13 @@ def main(argv: list[str] | None = None) -> int:
         print(f"ERROR: {exc}", file=sys.stderr)
         return 2
 
-    v3 = select_groups(table.loc[table["list"] == "v3"])
+    v3 = select_groups(table.loc[table["list"] == "v3"], metal_cap=args.metal_cap, exclude=exclude)
     thesis_table = select_groups(table.loc[table["list"] == "thesis_top10"]).assign(group="thesis_top10")
+    control = (
+        select_control(table.loc[table["list"] == "control_pool"])
+        if args.control_candidates is not None
+        else table.iloc[0:0].assign(first_failure="", S7=pd.NA, group="")
+    )
     columns = [
         "group", "formula", "formula_plain", "magnetic_score", "raw_score", "first_failure",
         "S1", "S2", "S3", "S4", "S5", "S6", "S7", "S8", "S9", "oxidation_states", "oxidation_likelihood",
@@ -628,7 +716,7 @@ def main(argv: list[str] | None = None) -> int:
         "literature_hits", "literature_2d_hits", "literature_bulk", "literature_examples",
     ]
     args.output_dir.mkdir(parents=True, exist_ok=True)
-    final = pd.concat([v3, thesis_table], ignore_index=True)[columns]
+    final = pd.concat([v3, thesis_table, *([control] if len(control) else [])], ignore_index=True)[columns]
     final.to_csv(args.output_dir / "candidates_final.csv", index=False)
 
     funnel = {"screened": int(len(v3))}
@@ -645,6 +733,21 @@ def main(argv: list[str] | None = None) -> int:
         "reference": list(REFERENCES),
         "thesis_top10_first_failure": dict(zip(thesis_table["formula_plain"], thesis_table["first_failure"])),
     }
+    if args.metal_cap is not None:
+        summary["metal_cap"] = args.metal_cap
+    if exclude:
+        summary["excluded_earlier_batch"] = sorted(exclude)
+    if args.control_candidates is not None:
+        evaluated = control.loc[control["S2"].astype(bool) & control["S3"].astype(bool) & control["S4"].astype(bool)]
+        summary["control"] = {
+            "rule": f"score < {CONTROL_MAX_SCORE}, contains {'/'.join(MAGNETIC_METALS)}, passes "
+            f"{', '.join(CONTROL_FILTERS)}; lowest score first, one per family, cation set and metal",
+            "pool": int(len(control)),
+            "pool_passing_S2_S4": int(len(evaluated)),
+            "pool_passing_all": int((control["first_failure"] == "pass").sum()),
+            "picked": control.loc[control["group"] == "control", "formula_plain"].tolist(),
+            "fixed": list(CONTROL_FIXED),
+        }
     (args.output_dir / "selection.json").write_text(
         json.dumps(summary, indent=2, sort_keys=True) + "\n", encoding="utf-8"
     )
@@ -653,6 +756,8 @@ def main(argv: list[str] | None = None) -> int:
         print(f"{step}: {count:,}")
     print("Main:", ", ".join(summary["main"]) or "none")
     print("Reference:", ", ".join(summary["reference"]))
+    if "control" in summary:
+        print("Control:", ", ".join(summary["control"]["picked"] + summary["control"]["fixed"]))
     for name, ok in provider_ok.items():
         if not ok:
             print(f"WARNING: OPTIMADE provider {name} did not answer every query", file=sys.stderr)
