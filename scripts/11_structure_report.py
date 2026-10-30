@@ -13,7 +13,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import shutil
 from pathlib import Path
 
 import matplotlib.pyplot as plt
@@ -210,7 +209,10 @@ def main() -> None:
         sub = {"reference": "referans", "control": "kontrol"}.get(r["group"], r["batch"].lower().replace(" ", ""))
         target = args.out / "yapilar" / sub / r["formula"]
         target.mkdir(parents=True, exist_ok=True)
-        shutil.copy(r["folder"] / "POSCAR.mace", target / file_name(r))
+        # the comment line carries the author tag and the prototype, so the file says where it came from
+        lines = (r["folder"] / "POSCAR.mace").read_text().splitlines(keepends=True)
+        lines[0] = f"{r['formula']} atozturk {r['prototype']} {r['source']} {r['proto_id']} MACE-relaxed\n"
+        (target / file_name(r)).write_text("".join(lines))
 
     args.out.mkdir(parents=True, exist_ok=True)
     with PdfPages(args.out / "yapilar.pdf") as pdf:

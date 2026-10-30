@@ -57,13 +57,20 @@ are in `selection.json`.
    prototype, and write POSCARs with 20 Å vacuum. Ata and Yeşim Hoca look at them in VESTA before anything goes
    to TRUBA.
 3. Settings, fixed on 2026-10-30:
-   - **Hubbard U:** the values C2DB uses, so that DFT and the training label agree. They still have to be checked
-     against Haastrup et al. 2018. Literature U values may come later as a sensitivity check.
+   - **Hubbard U:** none in the main run, so that DFT and the training label agree: the C2DB magnetic label and
+     structures are plain PBE, and the PBE+U results (U_eff = 4 eV on V, Cr, Mn, Fe, Co, Ni, Cu) were added to C2DB
+     later as a separate set (arXiv 2411.10790). The group's VASP examples use no U either. U = 4 eV is a check on
+     CrI3 and on the candidates that come out stable. (Changed on 2026-10-30 from "the values C2DB uses"; to be
+     confirmed with Yeşim Hoca.)
    - **ENCUT:** 1.3 × the largest ENMAX among the material's POTCARs, the lower limit the VASP wiki recommends
      for volume relaxation. The same value is used in every step of one material (relax, NM/FM/AFM, phonons), so
      the energies are comparable. There is no convergence scan per candidate. On CrI3, 1.3× is compared once
      with 1.5×.
-   - **Phonons:** phonopy finite displacements. VASP's DFPT (IBRION=7/8) does not support +U.
+   - **Phonons:** the group's recipe, VASP DFPT (IBRION=8) with phonopy, 4×4×1 supercell and 4×4×1 k-points,
+     path Γ-M-K-Γ (Γ-X-S-Y-Γ for non-hexagonal cells). Possible because there is no U; with U, phonopy finite
+     displacements.
+   - **Vacuum:** ISIF=3 and ISIF=2 relaxations run with the group's fixed-c VASP build (`walk_z`), or
+     `LATTICE_CONSTRAINTS = .TRUE. .TRUE. .FALSE.` (VASP 6.6.0).
 
 ## Caveats
 
