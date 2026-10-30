@@ -57,18 +57,22 @@ are in `selection.json`.
    prototype, and write POSCARs with 20 Å vacuum. Ata and Yeşim Hoca look at them in VESTA before anything goes
    to TRUBA.
 3. Settings, fixed on 2026-10-30:
-   - **Hubbard U:** none in the main run, so that DFT and the training label agree: the C2DB magnetic label and
-     structures are plain PBE, and the PBE+U results (U_eff = 4 eV on V, Cr, Mn, Fe, Co, Ni, Cu) were added to C2DB
-     later as a separate set (arXiv 2411.10790). The group's VASP examples use no U either. U = 4 eV is a check on
-     CrI3 and on the candidates that come out stable. (Changed on 2026-10-30 from "the values C2DB uses"; to be
-     confirmed with Yeşim Hoca.)
+   - **Method:** VASP, GGA (PBE) + U, Dudarev, U = 4 eV on the 3d shell of V, Cr, Mn, Fe, Co, Ni, Cu and none on
+     other elements. This is the PBE+U set C2DB added later (arXiv 2411.10790). The C2DB magnetic label itself is
+     plain PBE; that study finds U barely changes magnetic moments and turns some AFM materials FM. (Changed twice
+     on 2026-10-30, final: Ata's decision.)
+   - **vdW:** IVDW = 11 (D3) in every step, from the group's ISIF=3 example, so the relaxed structure is in
+     equilibrium for the phonon run.
    - **ENCUT:** 1.3 × the largest ENMAX among the material's POTCARs, the lower limit the VASP wiki recommends
      for volume relaxation. The same value is used in every step of one material (relax, NM/FM/AFM, phonons), so
      the energies are comparable. There is no convergence scan per candidate. On CrI3, 1.3× is compared once
      with 1.5×.
-   - **Phonons:** the group's recipe, VASP DFPT (IBRION=8) with phonopy, 4×4×1 supercell and 4×4×1 k-points,
-     path Γ-M-K-Γ (Γ-X-S-Y-Γ for non-hexagonal cells). Possible because there is no U; with U, phonopy finite
-     displacements.
+   - **Phonons:** 4×4×1 supercell and 4×4×1 k-points, path Γ-M-K-Γ (Γ-X-S-Y-Γ for non-hexagonal cells). The
+     group's recipe is VASP DFPT (IBRION=8) with phonopy; whether DFPT supports +U is not confirmed in the VASP
+     documentation, so CrI3 runs both DFPT and phonopy finite displacements, and finite displacements are used if
+     they disagree or DFPT fails.
+   - **Cell size:** cells above 10 atoms wait (`scripts/11_structure_report.py --max-atoms`). CrFeO3, Mn2CoTe4 and
+     Mn2CrTe4 have no smaller held prototype and wait as a whole.
    - **Vacuum:** ISIF=3 and ISIF=2 relaxations run with the group's fixed-c VASP build (`walk_z`), or
      `LATTICE_CONSTRAINTS = .TRUE. .TRUE. .FALSE.` (VASP 6.6.0).
 

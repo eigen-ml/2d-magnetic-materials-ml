@@ -57,7 +57,7 @@ def spacegroup(atoms) -> tuple[str, int]:
         return "?", 0
 
 
-def collect(label: str, structures: Path, candidates: Path, scores: Path) -> pd.DataFrame:
+def collect(label: str, structures: Path, candidates: Path, scores: Path, max_atoms: int) -> pd.DataFrame:
     ranking = pd.read_csv(structures / "summary_mlip.csv")
     table = pd.read_csv(candidates).drop_duplicates("formula").set_index("formula")
     # the control picks are not in the candidate table; their score comes from the full scoring, by composition
@@ -100,11 +100,14 @@ def collect(label: str, structures: Path, candidates: Path, scores: Path) -> pd.
         df.loc[part.index[0], "to_vasp"] = True
         if len(part) > 1 and part["delta_meV"].iloc[1] - e0 <= 25:
             df.loc[part.index[1], "to_vasp"] = True
+    # large cells wait: a 4x4x1 phonon supercell of them is too heavy for now; nothing replaces them
+    df["parked"] = df["to_vasp"] & (df["nsites"] > max_atoms)
+    df.loc[df["parked"], "to_vasp"] = False
     return df
 
 
 def file_name(row) -> str:
-    tag = "VASP" if row["to_vasp"] else ("elendi" if not row["holds"] else "yedek")
+    tag = "VASP" if row["to_vasp"] else "bekliyor" if row["parked"] else "elendi" if not row["holds"] else "yedek"
     return f"{row['formula']}_{row['mace_rank']}_{tag}_{row['sg_file']}.vasp"
 
 
@@ -138,7 +141,7 @@ def summary_pages(pdf: PdfPages, df: pd.DataFrame, title: str, per_page: int = 2
     for n, chunk in enumerate(pages, 1):
         fig = plt.figure(figsize=(11.69, 8.27))
         fig.text(0.04, 0.95, f"{title}  ({n} / {len(pages)})", fontsize=15, weight="bold")
-        fig.text(0.04, 0.915, "Her bileşim için VASP'a giden prototip(ler). Yapılar MACE (makine öğrenmesi potansiyeli) "
+        fig.text(0.04, 0.915, "Her bileşim için VASP'a giden prototip(ler); 10 atomdan büyük hücreler bekliyor. Yapılar MACE (makine öğrenmesi potansiyeli) "
                  "ile ön gevşetildi; ΔE yalnız prototip seçimi içindir, sonuç değildir.", fontsize=9)
         fig.text(0.04, 0.893, "ML skoru: parti 1 v3 modeli, parti 2 v4 modeli (yalnız C2DB). Referanslar ve MnBr2 bilinen "
                  "malzemeler, skorları yok.", fontsize=9)
@@ -169,7 +172,8 @@ def formula_page(pdf: PdfPages, part: pd.DataFrame) -> None:
         ax2 = fig.add_axes([0.36, top + 0.02, 0.22, height - 0.04])
         draw(ax2, atoms, "-90x", (3, 1, 1))
         ax2.set_title("Yandan (3×1)", fontsize=8)
-        verdict = "VASP'a gider" if r["to_vasp"] else ("Elendi: tek katman tutmadı" if not r["holds"] else "Yedek")
+        verdict = ("VASP'a gider" if r["to_vasp"] else f"Bekliyor: {r['nsites']} atom, büyük hücre" if r["parked"]
+                   else "Elendi: tek katman tutmadı" if not r["holds"] else "Yedek")
         lines = [
             f"{r['mace_rank']}. sıra  ·  {verdict}",
             f"Dosya: {file_name(r)}",
@@ -195,6 +199,7 @@ def formula_page(pdf: PdfPages, part: pd.DataFrame) -> None:
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     parser.add_argument("--out", type=Path, required=True)
+    parser.add_argument("--max-atoms", type=int, default=10, help="larger cells are parked, not sent to VASP")
     args = parser.parse_args()
 
     batches = [
@@ -203,7 +208,7 @@ def main() -> None:
         ("Parti 2", ROOT / "dft" / "batch2" / "structures", ROOT / "dft" / "batch2" / "candidates_final.csv",
          ROOT / "results" / "v4" / "all_scores.csv"),
     ]
-    df = pd.concat([collect(*b) for b in batches], ignore_index=True)
+    df = pd.concat([collect(*b, args.max_atoms) for b in batches], ignore_index=True)
 
     for _, r in df.iterrows():
         sub = {"reference": "referans", "control": "kontrol"}.get(r["group"], r["batch"].lower().replace(" ", ""))
@@ -220,11 +225,13 @@ def main() -> None:
         for _, part in df.groupby(["batch", "group", "formula"], sort=True):
             formula_page(pdf, part)
 
-    keep = ["batch", "group", "formula", "mace_rank", "to_vasp", "holds", "to_vasp_08", "sg_start", "sg_mace",
+    keep = ["batch", "group", "formula", "mace_rank", "to_vasp", "parked", "holds", "to_vasp_08", "sg_start", "sg_mace",
             "nsites", "a", "b", "gamma", "t_start", "t_mace", "t_ratio", "pieces", "dmin", "delta_meV",
             "prototype", "source", "proto_id", "score", "hull", "ox"]
     df[keep].round(4).to_csv(args.out / "yapilar.csv", index=False)
-    changed = df[df["to_vasp"] != df["to_vasp_08"]]
+    changed = df[(df["to_vasp"] | df["parked"]) != df["to_vasp_08"]]
+    parked = sorted(set(df.loc[df["parked"], "formula"]) - set(df.loc[df["to_vasp"], "formula"]))
+    print(f"parked: {int(df['parked'].sum())} structures; compositions left with nothing: {', '.join(parked) or 'none'}")
     print(f"{len(df)} structures, {int(df['to_vasp'].sum())} to VASP; differs from 08's choice: "
           f"{', '.join(changed['formula'] + '/' + changed['mace_rank'].astype(str)) or 'none'}")
 
