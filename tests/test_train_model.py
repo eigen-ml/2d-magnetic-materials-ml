@@ -37,6 +37,28 @@ def test_featurization_has_deterministic_column_order(train_module):
     assert indices == [0, 1]
 
 
+def test_split_like_follows_the_reference_partition_and_order(train_module):
+    import pytest
+
+    formulas = [f"Fe{n}O{n + 1}" for n in range(1, 41)]
+    reference = pd.DataFrame({"formula_normalized": formulas, "is_magnetic": [n % 2 for n in range(40)]})
+    partition = train_module.reference_partition(reference)
+    features, _ = train_module.featurize_dataset(reference)
+    expected = train_module.split_dataset(features)
+
+    # A subset in another order, with flipped labels: partition and order still follow the reference.
+    subset = reference.iloc[::-2].reset_index(drop=True).assign(is_magnetic=lambda d: 1 - d["is_magnetic"])
+    sub_features, valid = train_module.featurize_dataset(subset)
+    names = pd.Series(subset.loc[valid, "formula_normalized"].to_numpy(), index=sub_features.index)
+    parts = train_module.split_like(sub_features, names, partition)
+
+    for got, want in zip(parts[:3], expected[:3]):
+        want_formulas = [formulas[i] for i in want.index if formulas[i] in set(names)]
+        assert names.loc[got.index].tolist() == want_formulas
+    with pytest.raises(train_module.TrainingDataError, match="not in the reference split"):
+        train_module.split_like(sub_features, names.replace(names.iloc[0], "MnO"), partition)
+
+
 def test_threshold_is_selected_on_validation_constraints(train_module):
     classifier = FixedScoreClassifier([0.10, 0.40, 0.80, 0.90])
     threshold, scores, selection = train_module.find_operating_threshold(

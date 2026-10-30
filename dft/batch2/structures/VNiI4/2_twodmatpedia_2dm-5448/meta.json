@@ -1,0 +1,46 @@
+{
+  "anonymous": "A4BC",
+  "candidate_ox": {
+    "I": -1,
+    "Ni": 2,
+    "V": 2
+  },
+  "citation": "Zhou et al., Sci. Data 6, 86 (2019)",
+  "formula": "VNiI4",
+  "group": "main",
+  "id": "2dm-5448",
+  "licence": "CC BY 4.0",
+  "mace_a_b_A": [
+    3.981,
+    13.882
+  ],
+  "mace_bonded_pieces": 1,
+  "mace_converged": true,
+  "mace_energy_eV_per_atom": -3.78155,
+  "mace_max_plane_gap_A": 1.458,
+  "mace_min_distance_A": 2.655,
+  "mace_model": "MACE-MP-0 medium",
+  "mace_steps": 17,
+  "mace_thickness_A": 3.193,
+  "mapping": {
+    "Ca": "V",
+    "I": "I",
+    "Pb": "Ni"
+  },
+  "min_distance_A": 2.915,
+  "note": "Unrelaxed starting structure; needs MLIP pre-relax and a VESTA check.",
+  "nsites": 12,
+  "prototype_formula": "CaI4Pb",
+  "prototype_ox": {
+    "Ca": 2,
+    "I": -1,
+    "Pb": 2
+  },
+  "rank": 2,
+  "score": 0.5601503759398496,
+  "source": "twodmatpedia",
+  "spacegroup_symprec0.1": "P2_1/m (11)",
+  "start_thickness_A": 3.566,
+  "thickness_A": 3.566,
+  "vacuum_A": 20.0
+}

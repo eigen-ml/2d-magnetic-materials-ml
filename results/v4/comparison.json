@@ -1,0 +1,184 @@
+{
+  "label_sets": {
+    "other": "c2db_thesis_table.csv",
+    "test_formulas_where_they_differ": 28,
+    "truth": "c2db_lowest_hull.csv"
+  },
+  "magnetic_share": 0.2508,
+  "magnetic_share_by_metal": {
+    "Co": {
+      "formulas": 103,
+      "magnetic_share": 0.553
+    },
+    "Cr": {
+      "formulas": 79,
+      "magnetic_share": 0.861
+    },
+    "Fe": {
+      "formulas": 99,
+      "magnetic_share": 0.848
+    },
+    "Mn": {
+      "formulas": 175,
+      "magnetic_share": 0.96
+    },
+    "Ni": {
+      "formulas": 169,
+      "magnetic_share": 0.42
+    },
+    "V": {
+      "formulas": 109,
+      "magnetic_share": 0.642
+    }
+  },
+  "models": {
+    "c2db_thesis_table": {
+      "other": {
+        "accuracy": 0.8982334869431644,
+        "confusion_matrix": {
+          "fn": 153,
+          "fp": 112,
+          "tn": 1831,
+          "tp": 508
+        },
+        "f1_score": 0.7931303669008587,
+        "precision": 0.8193548387096774,
+        "precision_at_0_98": 0.9758064516129032,
+        "recall": 0.7685325264750378,
+        "roc_auc": 0.9359814470347411,
+        "rows_at_0_98": 124,
+        "threshold": 0.4230769230769231
+      },
+      "truth": {
+        "accuracy": 0.9051459293394777,
+        "confusion_matrix": {
+          "fn": 140,
+          "fp": 107,
+          "tn": 1844,
+          "tp": 513
+        },
+        "f1_score": 0.8059701492537313,
+        "precision": 0.8274193548387097,
+        "precision_at_0_98": 0.9758064516129032,
+        "recall": 0.7856049004594181,
+        "roc_auc": 0.9405103441671644,
+        "rows_at_0_98": 124,
+        "threshold": 0.4230769230769231
+      }
+    },
+    "v3": {
+      "other": {
+        "accuracy": 0.8713517665130568,
+        "confusion_matrix": {
+          "fn": 267,
+          "fp": 68,
+          "tn": 1875,
+          "tp": 394
+        },
+        "f1_score": 0.7016918967052538,
+        "precision": 0.8528138528138528,
+        "precision_at_0_98": 0.9689119170984456,
+        "recall": 0.5960665658093798,
+        "roc_auc": 0.8929050558153984,
+        "rows_at_0_98": 193,
+        "threshold": 0.6666666666666666
+      },
+      "truth": {
+        "accuracy": 0.8782642089093702,
+        "confusion_matrix": {
+          "fn": 254,
+          "fp": 63,
+          "tn": 1888,
+          "tp": 399
+        },
+        "f1_score": 0.715695067264574,
+        "precision": 0.8636363636363636,
+        "precision_at_0_98": 0.9689119170984456,
+        "recall": 0.6110260336906586,
+        "roc_auc": 0.9001638928636746,
+        "rows_at_0_98": 193,
+        "threshold": 0.6666666666666666
+      }
+    },
+    "v4": {
+      "other": {
+        "accuracy": 0.8982334869431644,
+        "confusion_matrix": {
+          "fn": 129,
+          "fp": 136,
+          "tn": 1807,
+          "tp": 532
+        },
+        "f1_score": 0.800601956358164,
+        "precision": 0.7964071856287425,
+        "precision_at_0_98": 0.9810126582278481,
+        "recall": 0.8048411497730711,
+        "roc_auc": 0.936754227713745,
+        "rows_at_0_98": 158,
+        "threshold": 0.4107142857142857
+      },
+      "truth": {
+        "accuracy": 0.9051459293394777,
+        "confusion_matrix": {
+          "fn": 116,
+          "fp": 131,
+          "tn": 1820,
+          "tp": 537
+        },
+        "f1_score": 0.8130204390613172,
+        "precision": 0.8038922155688623,
+        "precision_at_0_98": 0.9810126582278481,
+        "recall": 0.8223583460949464,
+        "roc_auc": 0.945631211229487,
+        "rows_at_0_98": 158,
+        "threshold": 0.4107142857142857
+      }
+    }
+  },
+  "rule_contains_Mn_Cr_Fe_Co_V_Ni": {
+    "accuracy": 0.8575268817204301,
+    "confusion_matrix": {
+      "fn": 158,
+      "fp": 213,
+      "tn": 1738,
+      "tp": 495
+    },
+    "f1_score": 0.7274063188831741,
+    "precision": 0.6991525423728814,
+    "recall": 0.7580398162327718,
+    "roc_auc": 0.8244325170348892
+  },
+  "test_formulas": 2604,
+  "training_order_spread": {
+    "c2db_lowest_hull.csv": {
+      "f1_score": {
+        "max": 0.8118,
+        "mean": 0.8053,
+        "min": 0.7861,
+        "sd": 0.0071
+      },
+      "permutations": 10,
+      "roc_auc": {
+        "max": 0.9471,
+        "mean": 0.9452,
+        "min": 0.9434,
+        "sd": 0.001
+      }
+    },
+    "c2db_thesis_table.csv": {
+      "f1_score": {
+        "max": 0.8128,
+        "mean": 0.8078,
+        "min": 0.8003,
+        "sd": 0.0039
+      },
+      "permutations": 10,
+      "roc_auc": {
+        "max": 0.9441,
+        "mean": 0.942,
+        "min": 0.9405,
+        "sd": 0.0011
+      }
+    }
+  }
+}

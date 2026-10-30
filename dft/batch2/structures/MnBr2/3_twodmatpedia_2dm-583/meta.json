@@ -1,0 +1,43 @@
+{
+  "anonymous": "A2B",
+  "candidate_ox": {
+    "Br": -1,
+    "Mn": 2
+  },
+  "citation": "Zhou et al., Sci. Data 6, 86 (2019)",
+  "formula": "MnBr2",
+  "group": "control",
+  "id": "2dm-583",
+  "licence": "CC BY 4.0",
+  "mace_a_b_A": [
+    3.909,
+    6.763
+  ],
+  "mace_bonded_pieces": 1,
+  "mace_converged": true,
+  "mace_energy_eV_per_atom": -4.93868,
+  "mace_max_plane_gap_A": 1.467,
+  "mace_min_distance_A": 2.7,
+  "mace_model": "MACE-MP-0 medium",
+  "mace_steps": 17,
+  "mace_thickness_A": 3.018,
+  "mapping": {
+    "Br": "Br",
+    "Ti": "Mn"
+  },
+  "min_distance_A": 2.561,
+  "note": "Unrelaxed starting structure; needs MLIP pre-relax and a VESTA check.",
+  "nsites": 6,
+  "prototype_formula": "Br2Ti",
+  "prototype_ox": {
+    "Br": -1,
+    "Ti": 2
+  },
+  "rank": 3,
+  "score": 0.030000000000000027,
+  "source": "twodmatpedia",
+  "spacegroup_symprec0.1": "P2_1/m (11)",
+  "start_thickness_A": 3.765,
+  "thickness_A": 3.765,
+  "vacuum_A": 20.0
+}

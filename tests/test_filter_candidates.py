@@ -143,6 +143,46 @@ def test_select_groups_caps_each_family_and_cation_set(filter_module):
     assert table.set_index("formula").loc["G", "first_failure"] == "S6"
 
 
+def test_select_groups_caps_each_metal_and_skips_an_earlier_batch(filter_module):
+    rows = [
+        _passing_row("Mn2VSe4", "F1", "Mn+V", 0.99),  # in the earlier batch
+        _passing_row("MnCrS3", "F2", "Cr+Mn", 0.98),
+        _passing_row("MnFeS3", "F2", "Fe+Mn", 0.97),
+        _passing_row("Mn2CoO4", "F3", "Co+Mn", 0.96),
+        _passing_row("MnNiCl3", "F4", "Mn+Ni", 0.95),  # fourth Mn
+        _passing_row("CrFeO3", "F5", "Cr+Fe", 0.94),
+    ]
+    table = filter_module.select_groups(pd.DataFrame(rows), metal_cap=3, exclude=["Mn2VSe4"])
+    groups = dict(zip(table["formula"], table["group"]))
+    assert groups["Mn2VSe4"] == "earlier_batch"
+    assert [r["formula"] for r in rows if groups[r["formula"]] == "main"] == [
+        "MnCrS3", "MnFeS3", "Mn2CoO4", "CrFeO3",
+    ]
+
+
+def test_select_control_takes_low_scores_with_plausible_oxidation_states(filter_module):
+    def row(formula, family, cations, score, likelihood=0.4, **failed):
+        return {
+            **_passing_row(formula, family, cations, score),
+            "magnetic_score": score, "oxidation_likelihood": likelihood, **failed,
+        }
+
+    table = pd.DataFrame(
+        [
+            row("TaNi2Te4", "F1", "Ni+Ta", 0.01, likelihood=0.03),  # rare states
+            row("ZrNi2Te4", "F1", "Ni+Zr", 0.02),
+            row("HfNi2Te4", "F1", "Hf+Ni", 0.03),  # same family
+            row("ZrNi2Se4", "F2", "Ni+Zr", 0.04),  # same cation set
+            row("CoTe2Se", "F3", "Co", 0.05, S9=False),  # far above the hull
+            row("HfNi2S4", "F4", "Hf+Ni", 0.10, S5=False, S6=False),  # need not be new
+        ]
+    )
+    picked = filter_module.select_control(table, size=4)
+    assert picked.loc[picked["group"] == "control", "formula"].tolist() == ["ZrNi2Te4", "HfNi2S4"]
+    failures = picked.set_index("formula")["first_failure"]
+    assert (failures["TaNi2Te4"], failures["CoTe2Se"]) == ("likelihood", "S9")
+
+
 def test_s9_fails_only_far_above_the_hull(filter_module):
     row = _passing_row("X", "F1", "Mn+V", 0.9)
     assert filter_module.first_failure(pd.Series(row)) == "pass"

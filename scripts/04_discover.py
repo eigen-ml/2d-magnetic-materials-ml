@@ -234,6 +234,11 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--model-dir", type=Path, default=DEFAULT_MODEL_DIR)
     parser.add_argument("--results-dir", type=Path, default=DEFAULT_RESULTS_DIR)
     parser.add_argument("--shortlist-size", type=int, default=50)
+    parser.add_argument(
+        "--all-scores",
+        action="store_true",
+        help="also write all_scores.csv with every scored composition, below the threshold too",
+    )
     return parser
 
 
@@ -286,6 +291,13 @@ def main(argv: list[str] | None = None) -> int:
             ascending=[False, False, True],
             ignore_index=True,
         )
+        everything = pd.DataFrame(
+            {"formula": valid_formulas, "magnetic_score": scores, "raw_score": uncalibrated}
+        ).sort_values(
+            ["magnetic_score", "raw_score", "formula"],
+            ascending=[False, False, True],
+            ignore_index=True,
+        )
     except (
         FileNotFoundError,
         OSError,
@@ -302,6 +314,8 @@ def main(argv: list[str] | None = None) -> int:
     shortlist_path = args.results_dir / "candidate_shortlist.csv"
     summary_path = args.results_dir / "screening_summary.json"
     results.to_csv(results_path, index=False)
+    if args.all_scores:
+        everything.to_csv(args.results_dir / "all_scores.csv", index=False)
 
     shortlist = results.head(args.shortlist_size).copy()
     shortlist.insert(0, "rank", range(1, len(shortlist) + 1))

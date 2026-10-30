@@ -1,0 +1,46 @@
+{
+  "anonymous": "A3BC",
+  "candidate_ox": {
+    "Fe": 3,
+    "Se": -2,
+    "V": 3
+  },
+  "citation": "Zhou et al., Sci. Data 6, 86 (2019)",
+  "formula": "VFeSe3",
+  "group": "main",
+  "id": "2dm-3620",
+  "licence": "CC BY 4.0",
+  "mace_a_b_A": [
+    3.296,
+    8.67
+  ],
+  "mace_bonded_pieces": 1,
+  "mace_converged": true,
+  "mace_energy_eV_per_atom": -6.0556,
+  "mace_max_plane_gap_A": 1.059,
+  "mace_min_distance_A": 2.402,
+  "mace_model": "MACE-MP-0 medium",
+  "mace_steps": 39,
+  "mace_thickness_A": 4.908,
+  "mapping": {
+    "In": "V",
+    "S": "Se",
+    "Sb": "Fe"
+  },
+  "min_distance_A": 2.518,
+  "note": "Unrelaxed starting structure; needs MLIP pre-relax and a VESTA check.",
+  "nsites": 10,
+  "prototype_formula": "InS3Sb",
+  "prototype_ox": {
+    "In": 3,
+    "S": -2,
+    "Sb": 3
+  },
+  "rank": 3,
+  "score": 0.3803434849116952,
+  "source": "twodmatpedia",
+  "spacegroup_symprec0.1": "P2_1/m (11)",
+  "start_thickness_A": 5.769,
+  "thickness_A": 5.769,
+  "vacuum_A": 20.0
+}

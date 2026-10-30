@@ -1,0 +1,46 @@
+{
+  "anonymous": "A3BC",
+  "candidate_ox": {
+    "Cr": 3,
+    "Fe": 3,
+    "O": -2
+  },
+  "citation": "Zhou et al., Sci. Data 6, 86 (2019)",
+  "formula": "CrFeO3",
+  "group": "main",
+  "id": "2dm-4751",
+  "licence": "CC BY 4.0",
+  "mace_a_b_A": [
+    5.424,
+    5.424
+  ],
+  "mace_bonded_pieces": 1,
+  "mace_converged": true,
+  "mace_energy_eV_per_atom": -7.15406,
+  "mace_max_plane_gap_A": 1.852,
+  "mace_min_distance_A": 1.852,
+  "mace_model": "MACE-MP-0 medium",
+  "mace_steps": 26,
+  "mace_thickness_A": 4.458,
+  "mapping": {
+    "Al": "Cr",
+    "O": "O",
+    "Sb": "Fe"
+  },
+  "min_distance_A": 1.82,
+  "note": "Unrelaxed starting structure; needs MLIP pre-relax and a VESTA check.",
+  "nsites": 15,
+  "prototype_formula": "AlO3Sb",
+  "prototype_ox": {
+    "Al": 3,
+    "O": -2,
+    "Sb": 3
+  },
+  "rank": 1,
+  "score": 0.24629629629629624,
+  "source": "twodmatpedia",
+  "spacegroup_symprec0.1": "P31m (157)",
+  "start_thickness_A": 4.436,
+  "thickness_A": 4.436,
+  "vacuum_A": 20.0
+}

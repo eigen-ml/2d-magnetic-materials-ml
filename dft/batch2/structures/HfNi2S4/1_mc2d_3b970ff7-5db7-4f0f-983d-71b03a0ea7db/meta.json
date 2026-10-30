@@ -1,0 +1,46 @@
+{
+  "anonymous": "A4B2C",
+  "candidate_ox": {
+    "Hf": 4,
+    "Ni": 2,
+    "S": -2
+  },
+  "citation": "Campi et al., ACS Nano 17, 11268 (2023); Mounet et al., Nat. Nanotechnol. 13, 246 (2018)",
+  "formula": "HfNi2S4",
+  "group": "control",
+  "id": "3b970ff7-5db7-4f0f-983d-71b03a0ea7db",
+  "licence": "CC BY 4.0",
+  "mace_a_b_A": [
+    5.428,
+    5.428
+  ],
+  "mace_bonded_pieces": 1,
+  "mace_converged": true,
+  "mace_energy_eV_per_atom": -6.06106,
+  "mace_max_plane_gap_A": 1.147,
+  "mace_min_distance_A": 2.243,
+  "mace_model": "MACE-MP-0 medium",
+  "mace_steps": 13,
+  "mace_thickness_A": 2.293,
+  "mapping": {
+    "Cu": "Ni",
+    "S": "S",
+    "Ti": "Hf"
+  },
+  "min_distance_A": 2.282,
+  "note": "Unrelaxed starting structure; needs MLIP pre-relax and a VESTA check.",
+  "nsites": 7,
+  "prototype_formula": "Cu2S4Ti",
+  "prototype_ox": {
+    "Cu": 2,
+    "S": -2,
+    "Ti": 4
+  },
+  "rank": 1,
+  "score": 0.18691660880968913,
+  "source": "mc2d",
+  "spacegroup_symprec0.1": "P-42m (111)",
+  "start_thickness_A": 2.213,
+  "thickness_A": 2.213,
+  "vacuum_A": 20.0
+}

@@ -1,0 +1,46 @@
+{
+  "anonymous": "A3BC",
+  "candidate_ox": {
+    "Fe": 3,
+    "Se": -2,
+    "V": 3
+  },
+  "citation": "Campi et al., ACS Nano 17, 11268 (2023); Mounet et al., Nat. Nanotechnol. 13, 246 (2018)",
+  "formula": "VFeSe3",
+  "group": "main",
+  "id": "ce32a902-1a13-4bdd-b669-9b51f9247e55",
+  "licence": "CC BY 4.0",
+  "mace_a_b_A": [
+    3.396,
+    5.894
+  ],
+  "mace_bonded_pieces": 1,
+  "mace_converged": true,
+  "mace_energy_eV_per_atom": -6.02368,
+  "mace_max_plane_gap_A": 1.418,
+  "mace_min_distance_A": 2.27,
+  "mace_model": "MACE-MP-0 medium",
+  "mace_steps": 35,
+  "mace_thickness_A": 7.82,
+  "mapping": {
+    "Ga": "Fe",
+    "In": "V",
+    "S": "Se"
+  },
+  "min_distance_A": 2.356,
+  "note": "Unrelaxed starting structure; needs MLIP pre-relax and a VESTA check.",
+  "nsites": 10,
+  "prototype_formula": "GaInS3",
+  "prototype_ox": {
+    "Ga": 3,
+    "In": 3,
+    "S": -2
+  },
+  "rank": 1,
+  "score": 0.28546044397602266,
+  "source": "mc2d",
+  "spacegroup_symprec0.1": "Pmn2_1 (31)",
+  "start_thickness_A": 7.551,
+  "thickness_A": 7.551,
+  "vacuum_A": 20.0
+}

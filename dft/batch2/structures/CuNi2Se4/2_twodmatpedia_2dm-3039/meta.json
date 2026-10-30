@@ -1,0 +1,46 @@
+{
+  "anonymous": "A4B2C",
+  "candidate_ox": {
+    "Cu": 2,
+    "Ni": 3,
+    "Se": -2
+  },
+  "citation": "Zhou et al., Sci. Data 6, 86 (2019)",
+  "formula": "CuNi2Se4",
+  "group": "control",
+  "id": "2dm-3039",
+  "licence": "CC BY 4.0",
+  "mace_a_b_A": [
+    3.609,
+    3.609
+  ],
+  "mace_bonded_pieces": 1,
+  "mace_converged": true,
+  "mace_energy_eV_per_atom": -4.41108,
+  "mace_max_plane_gap_A": 2.363,
+  "mace_min_distance_A": 2.262,
+  "mace_model": "MACE-MP-0 medium",
+  "mace_steps": 18,
+  "mace_thickness_A": 9.006,
+  "mapping": {
+    "Ga": "Ni",
+    "S": "Se",
+    "Zn": "Cu"
+  },
+  "min_distance_A": 2.355,
+  "note": "Unrelaxed starting structure; needs MLIP pre-relax and a VESTA check.",
+  "nsites": 7,
+  "prototype_formula": "Ga2S4Zn",
+  "prototype_ox": {
+    "Ga": 3,
+    "S": -2,
+    "Zn": 2
+  },
+  "rank": 2,
+  "score": 0.12003236701379127,
+  "source": "twodmatpedia",
+  "spacegroup_symprec0.1": "P3m1 (156)",
+  "start_thickness_A": 9.621,
+  "thickness_A": 9.621,
+  "vacuum_A": 20.0
+}

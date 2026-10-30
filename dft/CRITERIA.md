@@ -50,7 +50,13 @@ finding.
   break the token, or only in the full text. Before the main 10 are fixed, I check each one by hand in Web of
   Science and Google Scholar, and record the result.
 - On 2026-10-28, the CMR (C2DB) OPTIMADE endpoint redirected away and OQMD returned 502. C2DB is covered through
-  the thesis C2DB table, OQMD is not used.
+  the thesis C2DB table, OQMD is not used. *(2026-10-30)* The thesis table has the same 13,251 formulas as the
+  current C2DB file (`c2db.db`, 2025-07-08, see `results/c2db_audit/summary.json`). S5 run against that file gives
+  a byte-identical `candidates_final.csv`. The C2DB web search listed 17,001 rows on 2026-10-30, against 16,905
+  structures in the file. The extra 96 were not checked.
+- The C2DB label means "spin-polarized in the FM state", not "ferromagnetic ground state": C2DB stores
+  antiferromagnets such as MnPS3 and MnBr2 in their FM state. The score says nothing about FM versus AFM. The DFT
+  step that compares NM, FM and AFM orderings answers that.
 - Database responses are cached under `dft/cache/` with the query date. A later rerun can differ if the databases
   change.
 
@@ -84,3 +90,38 @@ kept unchanged. Ata decided these three changes after reviewing it:
    batch 1 result is reported, failures included. Reason: relax and phonon judge each structure on its own, so a
    biased ranking changes which candidates get computed, not whether a computed one is stable. Cost: batch 1
    says little about how well the model ranks non-Mn compounds.
+   *Correction, 2026-10-30:* "C2DB does not show the gap" was wrong. On the C2DB test rows (thesis-table labels), 95% of the Mn
+   compositions are magnetic (Cr 86%, Fe 86%, V 64%, Co 56%, Ni 41%), so the preference comes from the C2DB
+   label itself. V2DB mainly pushes Cr down. Batch 1 stays as fixed above. Diagnosis: `results/v3/README.md`.
+
+**2026-10-30, before any DFT calculation.** Ata decided these after the Mn diagnosis and the C2DB label check:
+
+6. **Control group next to batch 1.** 3-4 compositions with a v4 score below 0.3 that pass S3 and S8, plus
+   MnBr2. MnBr2 is an antiferromagnetic monolayer in the literature, but C2DB stores it in the FM state with
+   5.0 μB. The group gets relax and the NM/FM/AFM comparison, no phonons. It measures two things: whether the
+   model separates low from high scores, and whether the DFT protocol finds an AFM ground state where there is
+   one. The list is fixed in `dft/batch2/selection.json` before any calculation of the group (item 9), and every
+   result is reported.
+7. **Main model and batch 2.** v4, trained on C2DB only (DFT labels, lowest-hull structure per formula), is the
+   main model. On the 2,604 C2DB test formulas it reaches ROC-AUC 0.946 against 0.900 for v3
+   (`results/v4/README.md`). Batch 2 comes from v4 with the same filters and at most 3 compositions per magnetic
+   metal (4 since item 9). v3 and the metal rule are reported next to it.
+8. **S5 reference.** The thesis table and the C2DB file from 2025-07-08 have the same formula set, so S5 keeps
+   the thesis table as its default and batch 1 does not change. A newer C2DB release goes through
+   `scripts/09_c2db_audit.py` first.
+
+**2026-10-30, after the first batch 2 run and before any DFT calculation.** The first run (checkpoint A) is
+kept unchanged in `dft/batch2/checkpoint-A/`. Ata decided:
+
+9. **Batch 2 and control rules in detail.**
+   - Batch 2: v4 screening. S2 counts templates among the v4 training compositions (C2DB only). Batch 1 formulas
+     are skipped. At most 4 compositions per magnetic metal (V, Cr, Mn, Fe, Co, Ni). With 3, only 9 fit,
+     because every candidate holds two magnetic metals.
+   - Control: v4 score below 0.3, contains one of those metals, and passes S2, S3, S4, S8 and S9 (S5 and S6 are
+     not required). The most likely oxidation-state assignment needs an ICSD likelihood of at least 0.05: the
+     first run picked VW2O4 and Zr2FeSe4, which need W+2 and Zr+3. Lowest score first, one per family and cation
+     set, 4 picks, plus MnBr2. The low-score pool is almost all Ni compounds, so the control tests the model
+     mainly on Ni.
+   - Everything stays 2D. A composition needs a same-stoichiometry 2D prototype (S8), and DFT is done on the
+     monolayer. Bulk data (S9, `bulk_known`) is information only.
+   - The lists are in `dft/batch2/selection.json` and are fixed from here on.

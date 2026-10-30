@@ -1,0 +1,46 @@
+{
+  "anonymous": "A3BC",
+  "candidate_ox": {
+    "Cr": 3,
+    "Fe": 3,
+    "O": -2
+  },
+  "citation": "Campi et al., ACS Nano 17, 11268 (2023); Mounet et al., Nat. Nanotechnol. 13, 246 (2018)",
+  "formula": "CrFeO3",
+  "group": "main",
+  "id": "9a175d27-232e-49fd-ae94-c903e870c672",
+  "licence": "CC BY 4.0",
+  "mace_a_b_A": [
+    3.661,
+    5.532
+  ],
+  "mace_bonded_pieces": 1,
+  "mace_converged": true,
+  "mace_energy_eV_per_atom": -6.8978,
+  "mace_max_plane_gap_A": 1.189,
+  "mace_min_distance_A": 1.879,
+  "mace_model": "MACE-MP-0 medium",
+  "mace_steps": 71,
+  "mace_thickness_A": 4.705,
+  "mapping": {
+    "As": "Fe",
+    "O": "O",
+    "Sb": "Cr"
+  },
+  "min_distance_A": 1.801,
+  "note": "Unrelaxed starting structure; needs MLIP pre-relax and a VESTA check.",
+  "nsites": 10,
+  "prototype_formula": "AsO3Sb",
+  "prototype_ox": {
+    "As": 3,
+    "O": -2,
+    "Sb": 3
+  },
+  "rank": 2,
+  "score": 0.251388888888889,
+  "source": "mc2d",
+  "spacegroup_symprec0.1": "Pc (7)",
+  "start_thickness_A": 4.134,
+  "thickness_A": 4.134,
+  "vacuum_A": 20.0
+}

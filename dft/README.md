@@ -56,10 +56,30 @@ are in `selection.json`.
 2. Stage P: build structures from same-stoichiometry 2D prototypes, relax them with an ML potential to pick the
    prototype, and write POSCARs with 20 Å vacuum. Ata and Yeşim Hoca look at them in VESTA before anything goes
    to TRUBA.
+3. Settings, fixed on 2026-10-30:
+   - **Method:** VASP, GGA (PBE) + U, Dudarev, U = 4 eV on the 3d shell of V, Cr, Mn, Fe, Co, Ni, Cu and none on
+     other elements. This is the PBE+U set C2DB added later (arXiv 2411.10790). The C2DB magnetic label itself is
+     plain PBE; that study finds U barely changes magnetic moments and turns some AFM materials FM. (Changed twice
+     on 2026-10-30, final: Ata's decision.)
+   - **vdW:** IVDW = 11 (D3) in every step, from the group's ISIF=3 example, so the relaxed structure is in
+     equilibrium for the phonon run.
+   - **ENCUT:** 1.3 × the largest ENMAX among the material's POTCARs, the lower limit the VASP wiki recommends
+     for volume relaxation. The same value is used in every step of one material (relax, NM/FM/AFM, phonons), so
+     the energies are comparable. There is no convergence scan per candidate. On CrI3, 1.3× is compared once
+     with 1.5×.
+   - **Phonons:** 4×4×1 supercell and 4×4×1 k-points, path Γ-M-K-Γ (Γ-X-S-Y-Γ for non-hexagonal cells). The
+     group's recipe is VASP DFPT (IBRION=8) with phonopy; whether DFPT supports +U is not confirmed in the VASP
+     documentation, so CrI3 runs both DFPT and phonopy finite displacements, and finite displacements are used if
+     they disagree or DFPT fails.
+   - **Cell size:** cells above 10 atoms wait (`scripts/11_structure_report.py --max-atoms`). CrFeO3, Mn2CoTe4 and
+     Mn2CrTe4 have no smaller held prototype and wait as a whole.
+   - **Vacuum:** ISIF=3 and ISIF=2 relaxations run with the group's fixed-c VASP build (`walk_z`), or
+     `LATTICE_CONSTRAINTS = .TRUE. .TRUE. .FALSE.` (VASP 6.6.0).
 
 ## Caveats
 
-- Mn is in 9 of the 10, and A2BX4 in 6. This is the model's preference, after the filters.
+- Mn is in 9 of the 10, and A2BX4 in 6. This is the model's preference, after the filters. It comes from the
+  C2DB label, where 95% of Mn compositions are magnetic (`results/v3/README.md`).
 - Element-level ICSD counts ignore the anion: Mn+3 is common in oxides, less so in chalcogenides and halides.
 - A composition near the bulk hull says nothing yet about its monolayer. The relax and phonon calculations
   answer that.

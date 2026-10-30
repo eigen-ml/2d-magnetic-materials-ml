@@ -28,6 +28,11 @@ def test_formula_normalization_and_feature_schema(discover_module):
     assert discover_module.featurize("FeO", ["elem_Fe", "natoms"]) is None
 
 
+def test_discovery_parser_has_an_all_scores_switch(discover_module):
+    assert discover_module.build_parser().parse_args(["--all-scores"]).all_scores is True
+    assert discover_module.build_parser().parse_args([]).all_scores is False
+
+
 def test_score_bands_are_descriptive(discover_module):
     assert discover_module.score_band(0.99) == "0.98-1.00"
     assert discover_module.score_band(0.96) == "0.95-0.98"

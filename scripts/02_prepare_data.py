@@ -2,10 +2,14 @@
 """Prepare composition-level magnetic labels from V2DB and, optionally, C2DB.
 
 Two targets are supported. ``net_moment`` (default) marks a composition as
-magnetic when it carries a net moment (FM or ferrimagnetic). It is the only
-definition both sources share: the C2DB rows hold the total cell moment, so
-an antiferromagnet with zero net moment cannot be told apart from a
-non-magnet. ``any_magnetic`` is the thesis target (V2DB FM or AFM).
+magnetic when it carries a net moment (V2DB ``FM``, C2DB total cell moment
+above 0.1). ``any_magnetic`` is the thesis target (V2DB FM or AFM).
+
+The two sources do not mean quite the same thing by a net moment. C2DB keeps
+magnetic materials in their ferromagnetic state, so a C2DB row with a moment
+means "spin-polarized when ordered ferromagnetically", not "ferromagnetic
+ground state". Known antiferromagnets such as MnPS3 and MnBr2 carry their
+FM-state moment and are labelled 1 (see scripts/09_c2db_audit.py).
 """
 
 from __future__ import annotations
@@ -29,6 +33,9 @@ C2DB_REQUIRED_COLUMNS = {"formula_normalized", "magmom"}
 TARGET_NET_MOMENT = "net_moment"
 TARGET_ANY_MAGNETIC = "any_magnetic"
 TARGETS = (TARGET_NET_MOMENT, TARGET_ANY_MAGNETIC)
+# Which C2DB structures label a formula: every structure (formulas whose structures
+# disagree are dropped), or only the lowest-hull structure that has a label.
+C2DB_STRUCTURES = ("all", "lowest-hull")
 # Same cut as the thesis C2DB labels: every magnetic C2DB row has |m| >= 0.104 and
 # every non-magnetic row |m| <= 0.090 (total moment per cell, mu_B).
 MAGMOM_THRESHOLD = 0.1
@@ -169,25 +176,48 @@ def process_v2db(
     return prepared, stats
 
 
-def process_c2db(filepath: str | Path) -> tuple[pd.DataFrame, dict[str, int]]:
+def process_c2db(
+    filepath: str | Path,
+    structures: str = "all",
+) -> tuple[pd.DataFrame, dict[str, int]]:
     """Load C2DB rows (formula + total moment) and label them by net moment.
 
     Accepts the thesis hybrid table, where C2DB rows are marked ``source=C2DB``,
-    or any table with ``formula_normalized`` and ``magmom`` columns.
+    or any table with ``formula_normalized`` and ``magmom`` columns, such as the
+    one ``09_c2db_audit.py`` writes from ``c2db.db``. The moment is that of the
+    stored FM state, see the module docstring. ``structures="lowest-hull"`` needs
+    an ``ehull`` column and labels each formula by its lowest-hull structure
+    among those with a label (a moment, or C2DB's is_magnetic key).
     """
+    if structures not in C2DB_STRUCTURES:
+        raise DataValidationError(f"unknown C2DB structure choice {structures!r}")
     source = Path(filepath)
     if not source.is_file():
         raise FileNotFoundError(f"C2DB input not found: {source}. Supply it with --c2db.")
 
     df = pd.read_csv(source)
-    validate_columns(df, C2DB_REQUIRED_COLUMNS, source)
+    required = C2DB_REQUIRED_COLUMNS | ({"ehull"} if structures == "lowest-hull" else set())
+    validate_columns(df, required, source)
     if "source" in df.columns:
         df = df.loc[df["source"].astype(str).str.upper() == "C2DB"]
 
     working = df.copy()
     working["formula_normalized"] = working["formula_normalized"].map(normalize_formula)
-    working = working.loc[working["formula_normalized"].notna() & working["magmom"].notna()]
-    working["is_magnetic"] = (working["magmom"].abs() > MAGMOM_THRESHOLD).astype(int)
+    working = working.loc[working["formula_normalized"].notna()]
+    label = (working["magmom"].abs() > MAGMOM_THRESHOLD).astype(float).where(working["magmom"].notna())
+    if "is_magnetic_key" in working.columns:
+        # c2db.db stores no moment for non-spin-polarized calculations; C2DB's own
+        # is_magnetic key is 0 for 3,060 of the 3,061 such structures.
+        label = label.fillna(working["is_magnetic_key"])
+    working["is_magnetic"] = label
+    unlabelled = working.loc[working["is_magnetic"].isna(), "formula_normalized"]
+    lowest_unlabelled = 0
+    if structures == "lowest-hull":
+        ordered = working.sort_values(["formula_normalized", "ehull"], kind="mergesort")
+        lowest_unlabelled = int(ordered.drop_duplicates("formula_normalized")["is_magnetic"].isna().sum())
+        working = ordered.loc[ordered["is_magnetic"].notna()].drop_duplicates("formula_normalized")
+    working = working.loc[working["is_magnetic"].notna()]
+    working["is_magnetic"] = working["is_magnetic"].astype(int)
 
     grouped = working.groupby("formula_normalized", sort=True, observed=True)
     label_counts = grouped["is_magnetic"].nunique()
@@ -206,6 +236,8 @@ def process_c2db(filepath: str | Path) -> tuple[pd.DataFrame, dict[str, int]]:
     stats = {
         "input_rows": int(len(working)),
         "conflicting_formulas_removed": int(len(conflicting_formulas)),
+        "unlabelled_rows": int(len(unlabelled)),
+        "lowest_hull_structure_unlabelled": lowest_unlabelled,
         "output_compositions": int(len(prepared)),
         "magnetic_compositions": int(prepared["is_magnetic"].sum()),
     }
@@ -264,6 +296,12 @@ def build_parser() -> argparse.ArgumentParser:
         help="table with C2DB formula + magmom rows (default: the thesis hybrid table)",
     )
     parser.add_argument("--no-c2db", action="store_true", help="use V2DB only")
+    parser.add_argument(
+        "--c2db-only",
+        action="store_true",
+        help="train on C2DB labels only; V2DB formulas still go into the known-material list",
+    )
+    parser.add_argument("--c2db-structures", choices=C2DB_STRUCTURES, default="all")
     parser.add_argument("--target", choices=TARGETS, default=TARGET_NET_MOMENT)
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
     parser.add_argument("--known-output", type=Path, default=DEFAULT_KNOWN_OUTPUT)
@@ -273,14 +311,23 @@ def build_parser() -> argparse.ArgumentParser:
 def main(argv: list[str] | None = None) -> int:
     """Run data preparation and return a process exit code."""
     args = build_parser().parse_args(argv)
+    if args.no_c2db and args.c2db_only:
+        print("ERROR: --no-c2db and --c2db-only exclude each other", file=sys.stderr)
+        return 2
     try:
-        v2db, stats = process_v2db(args.input, target=args.target)
+        if not args.c2db_only:
+            v2db, stats = process_v2db(args.input, target=args.target)
+        elif not args.input.is_file():
+            raise FileNotFoundError(f"V2DB input not found: {args.input} (needed for known materials)")
         known = collect_formulas(args.input, "Material")
         c2db = None
         if not args.no_c2db:
-            c2db, c2db_stats = process_c2db(args.c2db)
+            c2db, c2db_stats = process_c2db(args.c2db, structures=args.c2db_structures)
             known |= collect_formulas(args.c2db, "formula_normalized", source_filter="C2DB")
-        prepared, merge_stats = combine_sources(v2db, c2db)
+        if args.c2db_only:
+            prepared = c2db.reset_index(drop=True)
+        else:
+            prepared, merge_stats = combine_sources(v2db, c2db)
         args.output.parent.mkdir(parents=True, exist_ok=True)
         prepared.to_csv(args.output, index=False)
         known_count = create_known_materials(known, args.known_output)
@@ -290,25 +337,36 @@ def main(argv: list[str] | None = None) -> int:
 
     magnetic = int(prepared["is_magnetic"].sum())
     total = int(len(prepared))
-    print(f"Target: {args.target}")
-    print(f"V2DB input rows: {stats['input_rows']:,}")
-    print(f"V2DB invalid formula rows removed: {stats['invalid_formula_rows']:,}")
-    print(
-        "V2DB structurally conflicting formulas removed: "
-        f"{stats['conflicting_formulas_removed']:,}"
-    )
+    print(f"Target: {'C2DB net moment' if args.c2db_only else args.target}")
+    if not args.c2db_only:
+        print(f"V2DB input rows: {stats['input_rows']:,}")
+        print(f"V2DB invalid formula rows removed: {stats['invalid_formula_rows']:,}")
+        print(
+            "V2DB structurally conflicting formulas removed: "
+            f"{stats['conflicting_formulas_removed']:,}"
+        )
     if c2db is not None:
-        if args.target == TARGET_ANY_MAGNETIC:
+        if args.target == TARGET_ANY_MAGNETIC and not args.c2db_only:
             print(
-                "WARNING: C2DB labels are net-moment labels; AFM C2DB entries count as "
-                "non-magnetic under the any_magnetic target.",
+                "WARNING: C2DB labels are FM-state moments, not ground states; a C2DB "
+                "antiferromagnet usually counts as magnetic and a zero-moment row as "
+                "non-magnetic under any target.",
                 file=sys.stderr,
             )
+        print(f"C2DB structures used: {args.c2db_structures}")
+        print(f"C2DB rows without a moment or label: {c2db_stats['unlabelled_rows']:,}")
+        if args.c2db_structures == "lowest-hull":
+            print(
+                "C2DB formulas whose lowest-hull structure has no label "
+                "(the next labelled one is used, if any): "
+                f"{c2db_stats['lowest_hull_structure_unlabelled']:,}"
+            )
         print(f"C2DB compositions: {c2db_stats['output_compositions']:,}")
-        print(
-            f"Formulas in both sources: {merge_stats['overlap']:,} "
-            f"({merge_stats['overlap_disagreeing']:,} disagree; C2DB label kept)"
-        )
+        if not args.c2db_only:
+            print(
+                f"Formulas in both sources: {merge_stats['overlap']:,} "
+                f"({merge_stats['overlap_disagreeing']:,} disagree; C2DB label kept)"
+            )
     print(f"Prepared compositions: {total:,}")
     print(f"Magnetic compositions: {magnetic:,} ({magnetic / total:.1%})")
     print(f"Known-material reference entries: {known_count:,}")

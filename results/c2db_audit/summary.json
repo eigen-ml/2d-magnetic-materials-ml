@@ -1,0 +1,453 @@
+{
+  "db": {
+    "abs_magmom_bins": {
+      "[0.0, 0.1)": 9676,
+      "[0.1, 0.5)": 129,
+      "[0.5, 1.5)": 866,
+      "[1.5, inf)": 3173
+    },
+    "origin_rows": {
+      "Americo23_ic": 95,
+      "Lyngby22_CDVAE": 3042,
+      "Lyngby22_LDP": 8568,
+      "Manti22_pushed": 37,
+      "Wang23": 956,
+      "adhoc_material": 25,
+      "exfoliated02-21": 547,
+      "janus10-19": 216,
+      "original03-18": 3280,
+      "unknown": 139
+    },
+    "rows": 16905,
+    "rows_with_antiparallel_site_moments": 88,
+    "rows_with_is_magnetic_key": 8701,
+    "rows_with_magmom": 13844,
+    "rows_without_magmom_by_is_magnetic_key": {
+      "0": 3060,
+      "1": 1
+    },
+    "unique_formulas": 13251
+  },
+  "db_file": {
+    "name": "c2db.db",
+    "sha256": "a1a96ebc00c27dafecd7be8a1ebf7f2cbdedc8160626a674855d22ff466aef2d"
+  },
+  "db_formulas_not_in_thesis": {
+    "formulas": 0,
+    "rows_by_origin": {}
+  },
+  "known_magnets": {
+    "CrBr3": {
+      "db": [
+        {
+          "antiparallel": false,
+          "ehull": 0.0,
+          "is_magnetic_key": 1,
+          "magmom": 6.0,
+          "origin": "original03-18",
+          "uid": "2CrBr3-1"
+        },
+        {
+          "antiparallel": false,
+          "ehull": 0.224,
+          "is_magnetic_key": null,
+          "magmom": 6.0,
+          "origin": "Lyngby22_LDP",
+          "uid": "2CrBr3-2"
+        }
+      ],
+      "thesis_magmom": 6.0
+    },
+    "CrCl3": {
+      "db": [
+        {
+          "antiparallel": false,
+          "ehull": 0.0,
+          "is_magnetic_key": 1,
+          "magmom": 6.0,
+          "origin": "original03-18",
+          "uid": "2CrCl3-1"
+        },
+        {
+          "antiparallel": false,
+          "ehull": 0.248,
+          "is_magnetic_key": null,
+          "magmom": 6.0,
+          "origin": "Lyngby22_LDP",
+          "uid": "2CrCl3-2"
+        }
+      ],
+      "thesis_magmom": 6.0
+    },
+    "CrI3": {
+      "db": [
+        {
+          "antiparallel": false,
+          "ehull": 0.0,
+          "is_magnetic_key": 1,
+          "magmom": 6.0,
+          "origin": "original03-18",
+          "uid": "2CrI3-1"
+        },
+        {
+          "antiparallel": false,
+          "ehull": 0.197,
+          "is_magnetic_key": null,
+          "magmom": 6.0,
+          "origin": "Lyngby22_LDP",
+          "uid": "2CrI3-2"
+        }
+      ],
+      "thesis_magmom": 6.0
+    },
+    "CrSBr": {
+      "db": [
+        {
+          "antiparallel": false,
+          "ehull": 0.003,
+          "is_magnetic_key": 1,
+          "magmom": 6.0,
+          "origin": "original03-18",
+          "uid": "2BrCrS-1"
+        },
+        {
+          "antiparallel": false,
+          "ehull": 0.044,
+          "is_magnetic_key": 1,
+          "magmom": 3.0,
+          "origin": "unknown",
+          "uid": "1BrCrS-1"
+        }
+      ],
+      "thesis_magmom": 6.0
+    },
+    "Fe3GeTe2": {
+      "db": [
+        {
+          "antiparallel": false,
+          "ehull": 0.021,
+          "is_magnetic_key": 1,
+          "magmom": 6.317,
+          "origin": "adhoc_material",
+          "uid": "1GeTe2Fe3-1"
+        }
+      ],
+      "thesis_magmom": 6.317
+    },
+    "FeCl2": {
+      "db": [
+        {
+          "antiparallel": false,
+          "ehull": 0.0,
+          "is_magnetic_key": 1,
+          "magmom": 3.995,
+          "origin": "exfoliated02-21",
+          "uid": "1FeCl2-1"
+        },
+        {
+          "antiparallel": false,
+          "ehull": 0.037,
+          "is_magnetic_key": 1,
+          "magmom": 4.0,
+          "origin": "original03-18",
+          "uid": "1FeCl2-2"
+        },
+        {
+          "antiparallel": false,
+          "ehull": 0.067,
+          "is_magnetic_key": 1,
+          "magmom": 4.0,
+          "origin": "original03-18",
+          "uid": "1FeCl2-3"
+        }
+      ],
+      "thesis_magmom": 4.0
+    },
+    "FePS3": {
+      "db": [
+        {
+          "antiparallel": false,
+          "ehull": 0.132,
+          "is_magnetic_key": 1,
+          "magmom": 7.935,
+          "origin": "exfoliated02-21",
+          "uid": "2FePS3-1"
+        }
+      ],
+      "thesis_magmom": 7.935
+    },
+    "MnBr2": {
+      "db": [
+        {
+          "antiparallel": false,
+          "ehull": 0.0,
+          "is_magnetic_key": 1,
+          "magmom": 5.0,
+          "origin": "original03-18",
+          "uid": "1MnBr2-1"
+        },
+        {
+          "antiparallel": false,
+          "ehull": 0.033,
+          "is_magnetic_key": 1,
+          "magmom": 5.0,
+          "origin": "original03-18",
+          "uid": "1MnBr2-2"
+        },
+        {
+          "antiparallel": false,
+          "ehull": 0.129,
+          "is_magnetic_key": 1,
+          "magmom": 5.0,
+          "origin": "original03-18",
+          "uid": "1MnBr2-3"
+        }
+      ],
+      "thesis_magmom": 5.0
+    },
+    "MnCl2": {
+      "db": [
+        {
+          "antiparallel": false,
+          "ehull": 0.0,
+          "is_magnetic_key": 1,
+          "magmom": 5.0,
+          "origin": "original03-18",
+          "uid": "1MnCl2-1"
+        },
+        {
+          "antiparallel": false,
+          "ehull": 0.035,
+          "is_magnetic_key": 1,
+          "magmom": 5.0,
+          "origin": "original03-18",
+          "uid": "1MnCl2-2"
+        },
+        {
+          "antiparallel": false,
+          "ehull": 0.039,
+          "is_magnetic_key": 1,
+          "magmom": 15.0,
+          "origin": "Wang23",
+          "uid": "3MnCl2-1"
+        },
+        {
+          "antiparallel": false,
+          "ehull": 0.069,
+          "is_magnetic_key": 1,
+          "magmom": 20.0,
+          "origin": "Wang23",
+          "uid": "4MnCl2-1"
+        },
+        {
+          "antiparallel": false,
+          "ehull": 0.136,
+          "is_magnetic_key": 1,
+          "magmom": 5.0,
+          "origin": "original03-18",
+          "uid": "1MnCl2-3"
+        }
+      ],
+      "thesis_magmom": 5.0
+    },
+    "MnPS3": {
+      "db": [
+        {
+          "antiparallel": false,
+          "ehull": 0.031,
+          "is_magnetic_key": 1,
+          "magmom": 9.966,
+          "origin": "exfoliated02-21",
+          "uid": "2MnPS3-1"
+        }
+      ],
+      "thesis_magmom": 9.966
+    },
+    "MnPSe3": {
+      "db": [
+        {
+          "antiparallel": false,
+          "ehull": 0.074,
+          "is_magnetic_key": 1,
+          "magmom": 9.752,
+          "origin": "exfoliated02-21",
+          "uid": "2MnPSe3-1"
+        }
+      ],
+      "thesis_magmom": 9.752
+    },
+    "NiPS3": {
+      "db": [
+        {
+          "antiparallel": false,
+          "ehull": 0.054,
+          "is_magnetic_key": 1,
+          "magmom": 3.91,
+          "origin": "original03-18",
+          "uid": "2NiPS3-1"
+        },
+        {
+          "antiparallel": false,
+          "ehull": 0.282,
+          "is_magnetic_key": 1,
+          "magmom": 0.99,
+          "origin": "exfoliated02-21",
+          "uid": "1NiPS3-1"
+        }
+      ],
+      "thesis_magmom": 3.91
+    },
+    "VCl3": {
+      "db": [
+        {
+          "antiparallel": false,
+          "ehull": 0.0,
+          "is_magnetic_key": 1,
+          "magmom": 4.0,
+          "origin": "original03-18",
+          "uid": "2VCl3-1"
+        },
+        {
+          "antiparallel": false,
+          "ehull": 0.076,
+          "is_magnetic_key": 1,
+          "magmom": 2.0,
+          "origin": "Wang23",
+          "uid": "1VCl3-1"
+        },
+        {
+          "antiparallel": false,
+          "ehull": 0.109,
+          "is_magnetic_key": 1,
+          "magmom": 4.0,
+          "origin": "original03-18",
+          "uid": "2VCl3-2"
+        }
+      ],
+      "thesis_magmom": 2.0
+    }
+  },
+  "label_agreement_lowest_hull_polymorph": {
+    "overlap": 13251,
+    "thesis_vs_db_label": {
+      "thesis0_db0": 9809,
+      "thesis0_db1": 63,
+      "thesis1_db0": 121,
+      "thesis1_db1": 3258
+    },
+    "thesis_vs_is_magnetic_key": {
+      "thesis0_db0": 4651,
+      "thesis0_db1": 54,
+      "thesis1_db0": 118,
+      "thesis1_db1": 1149
+    },
+    "with_db_label": 13251,
+    "with_is_magnetic_key": 5972
+  },
+  "metal_magnetic_share_lowest_hull": {
+    "Co": {
+      "formulas": 464,
+      "magnetic_share": 0.588
+    },
+    "Cr": {
+      "formulas": 435,
+      "magnetic_share": 0.853
+    },
+    "Fe": {
+      "formulas": 568,
+      "magnetic_share": 0.838
+    },
+    "Mn": {
+      "formulas": 865,
+      "magnetic_share": 0.975
+    },
+    "Ni": {
+      "formulas": 775,
+      "magnetic_share": 0.375
+    },
+    "V": {
+      "formulas": 530,
+      "magnetic_share": 0.636
+    }
+  },
+  "mn_lowest_hull": {
+    "antiparallel_rows": 47,
+    "formulas": 865,
+    "magnetic_share": 0.975,
+    "with_label": 865
+  },
+  "s5_recheck": {
+    "batch1": {
+      "CrCoSe3": null,
+      "CrI3": {
+        "ehull": 0.0,
+        "origin": "original03-18",
+        "uid": "2CrI3-1"
+      },
+      "Mn2CoSe4": null,
+      "Mn2CoTe4": null,
+      "Mn2CrS4": null,
+      "Mn2CrTe4": null,
+      "Mn2VS4": null,
+      "Mn2VSe4": null,
+      "MnBr2Cl": null,
+      "MnBrCl2": null,
+      "MnFeS3": null,
+      "VCl3": {
+        "ehull": 0.0,
+        "origin": "original03-18",
+        "uid": "2VCl3-1"
+      }
+    },
+    "candidates": 1577,
+    "checked": {
+      "CoNi2Br4": null,
+      "CoNi2F4": null,
+      "CrFeO3": null,
+      "FeCoO3": null,
+      "Mn2CrO4": null,
+      "MnBr2": {
+        "ehull": 0.0,
+        "origin": "original03-18",
+        "uid": "1MnBr2-1"
+      },
+      "MnCrBr4": null,
+      "MnFe2O4": null,
+      "Ti2VTe4": null,
+      "VBr2Cl": null,
+      "VNi2Br4": null
+    },
+    "newly_in_c2db": 0,
+    "newly_in_c2db_passing": [],
+    "passing_after": 208,
+    "passing_before": 208
+  },
+  "thesis_table": {
+    "exact_matches_by_origin": {
+      "Americo23_ic": 77,
+      "Lyngby22_CDVAE": 2954,
+      "Lyngby22_LDP": 7397,
+      "Manti22_pushed": 13,
+      "Wang23": 467,
+      "adhoc_material": 10,
+      "exfoliated02-21": 448,
+      "janus10-19": 92,
+      "original03-18": 1677,
+      "unknown": 116
+    },
+    "formulas_in_db": 13251,
+    "formulas_not_in_db": 0,
+    "kept_polymorph": {
+      "above_lowest_by_more_than_0.05": 994,
+      "formulas": 1892,
+      "highest_hull": 1246,
+      "label_differs_from_lowest_hull": 184,
+      "lowest_hull": 321
+    },
+    "not_in_db_examples": [],
+    "rows": 13251,
+    "rows_with_exact_ehull_and_magmom_in_db": 11611,
+    "rows_with_exact_ehull_in_db": 13251,
+    "unique_formulas": 13251
+  }
+}
