@@ -1,0 +1,46 @@
+{
+  "anonymous": "A3BC",
+  "candidate_ox": {
+    "Mn": 2,
+    "O": -2,
+    "Ru": 4
+  },
+  "citation": "Campi et al., ACS Nano 17, 11268 (2023); Mounet et al., Nat. Nanotechnol. 13, 246 (2018)",
+  "formula": "MnRuO3",
+  "group": "main",
+  "id": "867418e4-5e7c-4fe7-bd17-cd439a593586",
+  "licence": "CC BY 4.0",
+  "mace_a_b_A": [
+    5.541,
+    5.534
+  ],
+  "mace_bonded_pieces": 1,
+  "mace_converged": true,
+  "mace_energy_eV_per_atom": -7.31231,
+  "mace_max_plane_gap_A": 1.124,
+  "mace_min_distance_A": 1.859,
+  "mace_model": "MACE-MP-0 medium",
+  "mace_steps": 246,
+  "mace_thickness_A": 2.28,
+  "mapping": {
+    "O": "O",
+    "Pd": "Mn",
+    "Se": "Ru"
+  },
+  "min_distance_A": 1.732,
+  "note": "Unrelaxed starting structure; needs MLIP pre-relax and a VESTA check.",
+  "nsites": 10,
+  "prototype_formula": "O3PdSe",
+  "prototype_ox": {
+    "O": -2,
+    "Pd": 2,
+    "Se": 4
+  },
+  "rank": 2,
+  "score": 0.21750000000000003,
+  "source": "mc2d",
+  "spacegroup_symprec0.1": "C2/m (12)",
+  "start_thickness_A": 4.5,
+  "thickness_A": 4.5,
+  "vacuum_A": 20.0
+}

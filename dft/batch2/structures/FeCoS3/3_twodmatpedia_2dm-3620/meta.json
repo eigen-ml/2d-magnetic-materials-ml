@@ -1,0 +1,46 @@
+{
+  "anonymous": "A3BC",
+  "candidate_ox": {
+    "Co": 3,
+    "Fe": 3,
+    "S": -2
+  },
+  "citation": "Zhou et al., Sci. Data 6, 86 (2019)",
+  "formula": "FeCoS3",
+  "group": "main",
+  "id": "2dm-3620",
+  "licence": "CC BY 4.0",
+  "mace_a_b_A": [
+    3.111,
+    7.969
+  ],
+  "mace_bonded_pieces": 1,
+  "mace_converged": true,
+  "mace_energy_eV_per_atom": -5.86033,
+  "mace_max_plane_gap_A": 1.022,
+  "mace_min_distance_A": 2.17,
+  "mace_model": "MACE-MP-0 medium",
+  "mace_steps": 34,
+  "mace_thickness_A": 4.568,
+  "mapping": {
+    "In": "Fe",
+    "S": "S",
+    "Sb": "Co"
+  },
+  "min_distance_A": 2.358,
+  "note": "Unrelaxed starting structure; needs MLIP pre-relax and a VESTA check.",
+  "nsites": 10,
+  "prototype_formula": "InS3Sb",
+  "prototype_ox": {
+    "In": 3,
+    "S": -2,
+    "Sb": 3
+  },
+  "rank": 3,
+  "score": 0.3315602836879432,
+  "source": "twodmatpedia",
+  "spacegroup_symprec0.1": "P2_1/m (11)",
+  "start_thickness_A": 5.402,
+  "thickness_A": 5.402,
+  "vacuum_A": 20.0
+}

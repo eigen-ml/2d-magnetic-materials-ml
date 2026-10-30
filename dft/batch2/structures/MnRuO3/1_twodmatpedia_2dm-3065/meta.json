@@ -1,0 +1,46 @@
+{
+  "anonymous": "A3BC",
+  "candidate_ox": {
+    "Mn": 2,
+    "O": -2,
+    "Ru": 4
+  },
+  "citation": "Zhou et al., Sci. Data 6, 86 (2019)",
+  "formula": "MnRuO3",
+  "group": "main",
+  "id": "2dm-3065",
+  "licence": "CC BY 4.0",
+  "mace_a_b_A": [
+    5.243,
+    5.243
+  ],
+  "mace_bonded_pieces": 1,
+  "mace_converged": true,
+  "mace_energy_eV_per_atom": -7.32906,
+  "mace_max_plane_gap_A": 1.103,
+  "mace_min_distance_A": 2.005,
+  "mace_model": "MACE-MP-0 medium",
+  "mace_steps": 11,
+  "mace_thickness_A": 3.515,
+  "mapping": {
+    "O": "O",
+    "Sn": "Ru",
+    "Zn": "Mn"
+  },
+  "min_distance_A": 1.94,
+  "note": "Unrelaxed starting structure; needs MLIP pre-relax and a VESTA check.",
+  "nsites": 10,
+  "prototype_formula": "O3SnZn",
+  "prototype_ox": {
+    "O": -2,
+    "Sn": 4,
+    "Zn": 2
+  },
+  "rank": 1,
+  "score": 0.18661007667031754,
+  "source": "twodmatpedia",
+  "spacegroup_symprec0.1": "P-31m (162)",
+  "start_thickness_A": 2.82,
+  "thickness_A": 2.82,
+  "vacuum_A": 20.0
+}

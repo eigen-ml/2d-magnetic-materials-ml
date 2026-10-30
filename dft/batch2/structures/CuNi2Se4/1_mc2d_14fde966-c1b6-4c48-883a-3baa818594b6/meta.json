@@ -1,0 +1,46 @@
+{
+  "anonymous": "A4B2C",
+  "candidate_ox": {
+    "Cu": 2,
+    "Ni": 3,
+    "Se": -2
+  },
+  "citation": "Campi et al., ACS Nano 17, 11268 (2023); Mounet et al., Nat. Nanotechnol. 13, 246 (2018)",
+  "formula": "CuNi2Se4",
+  "group": "control",
+  "id": "14fde966-c1b6-4c48-883a-3baa818594b6",
+  "licence": "CC BY 4.0",
+  "mace_a_b_A": [
+    3.77,
+    3.77
+  ],
+  "mace_bonded_pieces": 1,
+  "mace_converged": true,
+  "mace_energy_eV_per_atom": -4.38332,
+  "mace_max_plane_gap_A": 2.323,
+  "mace_min_distance_A": 2.206,
+  "mace_model": "MACE-MP-0 medium",
+  "mace_steps": 20,
+  "mace_thickness_A": 7.957,
+  "mapping": {
+    "Ga": "Ni",
+    "Mg": "Cu",
+    "Se": "Se"
+  },
+  "min_distance_A": 2.338,
+  "note": "Unrelaxed starting structure; needs MLIP pre-relax and a VESTA check.",
+  "nsites": 7,
+  "prototype_formula": "Ga2MgSe4",
+  "prototype_ox": {
+    "Ga": 3,
+    "Mg": 2,
+    "Se": -2
+  },
+  "rank": 1,
+  "score": 0.03794369645042843,
+  "source": "mc2d",
+  "spacegroup_symprec0.1": "P-3m1 (164)",
+  "start_thickness_A": 9.676,
+  "thickness_A": 9.676,
+  "vacuum_A": 20.0
+}

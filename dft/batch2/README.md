@@ -50,3 +50,44 @@ Pool: 98 compositions below 0.3 with a magnetic metal, 76 pass S2-S4, 16 pass ev
 likelihood floor. All four picks contain Ni: the model gives low scores almost only to Ni compounds. MnBr2 checks
 whether the protocol finds a known antiferromagnetic ground state. The control group gets relax and the NM/FM/AFM
 comparison, no phonons.
+
+## Stage P (30 Oct)
+
+```bash
+docker compose --profile research run --rm research python scripts/07_build_structures.py \
+    --selection dft/batch2/selection.json --out dft/batch2/structures --groups main,control
+.venv-mlip/bin/python scripts/08_mlip_rank.py --structures dft/batch2/structures
+```
+
+CrI3 and VCl3 are not rebuilt; batch 1 has them. Three prototypes per composition, 45 MACE relaxations, all
+converged. A relaxed prototype counts as a held monolayer when it is one bonded piece (covalent radii x 1.2) and its
+thickness stays within 0.7-1.3 of the start; only held prototypes go to VASP (`layer_holds`, `to_vasp` in
+`structures/summary_mlip.csv`). The 0.7-1.3 band is a working choice, not a physical criterion.
+
+| Formula | Group | To VASP (prototype, space group at start) | ΔE second, meV/atom | Rejected |
+| --- | --- | --- | --- | --- |
+| MnCrBr4 | main | CaI4Pb P2/m; CaI4Pb P2_1/m | 1.0 | P2_1/c flattened (0.66) |
+| Mn2CrSe4 | main | CrGa2Se4 P-3m1 | – | Pmna split in two |
+| Mn2VTe4 | main | Fe2Se4Ti P-1; Te4TiV2 C2/m | 4.7 | – |
+| MnRuO3 | main | O3SnZn P-31m | – | both O3PdSe flattened (0.51, 0.62) |
+| CrNiI4 | main | CaI4Pb P2/m; P2_1/m | 6.3 | – |
+| CrFeO3 | main | AlO3Sb P31m | – | MnO3Tl P-31m flattened (0.67) |
+| FeCoS3 | main | GaInS3 Pmn2_1 | – | – |
+| VFe2Se4 | main | Te4TiV2 C2/m; Fe2Se4Ti P-1 | 10.8 | – |
+| VFeSe3 | main | InS3Sb P2_1/m | – | – |
+| VNiI4 | main | CaI4Pb P2/m; P2_1/m | 10.7 | – |
+| ZrNi2Te4 | control | Fe2Se4Ti P-1 | – | – |
+| CuNi2Se4 | control | Ga2S4Zn P3m1; In2MgSe4 P-1 | 8.2 | – |
+| HfNi2S4 | control | Fe2Se4Ti P-1 | – | – |
+| NiPdSe3 | control | NiPSe3 P-31m | – | lowest, CaS3Sn Pmmm, thickened (1.38) |
+| MnBr2 | control | Br2Mn P-3m1 (its own structure); Br2Ti P2_1/m | 0.2 | – |
+
+Notes:
+- CrFeO3 holds in one prototype (P31m, 15 atoms, thickness unchanged); the other two either flatten or lie
+  256 meV/atom higher. MnRuO3 holds only in P-31m, and its thickness grows by 25 %, close to the band edge. Both stay
+  on the list (criteria item 9); a monolayer that fails in VASP is reported, not replaced.
+- MnBr2 lands on its known CdI2-type layer first, a sanity check on the ranking. The P2_1/m runner-up relaxes to the
+  same thickness and is probably the same layer; VESTA will show it.
+- MnCrBr4, CrNiI4 and VNiI4 have only the CaI4Pb family as prototype, with the largest substitution mismatch of
+  the batch (0.55-0.56).
+- MACE ignores spin order; it only picks prototypes. No MACE energy is a result.

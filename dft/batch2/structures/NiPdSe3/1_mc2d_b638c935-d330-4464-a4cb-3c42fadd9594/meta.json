@@ -1,0 +1,46 @@
+{
+  "anonymous": "A3BC",
+  "candidate_ox": {
+    "Ni": 2,
+    "Pd": 4,
+    "Se": -2
+  },
+  "citation": "Campi et al., ACS Nano 17, 11268 (2023); Mounet et al., Nat. Nanotechnol. 13, 246 (2018)",
+  "formula": "NiPdSe3",
+  "group": "control",
+  "id": "b638c935-d330-4464-a4cb-3c42fadd9594",
+  "licence": "CC BY 4.0",
+  "mace_a_b_A": [
+    6.213,
+    6.214
+  ],
+  "mace_bonded_pieces": 1,
+  "mace_converged": true,
+  "mace_energy_eV_per_atom": -4.47732,
+  "mace_max_plane_gap_A": 1.387,
+  "mace_min_distance_A": 2.38,
+  "mace_model": "MACE-MP-0 medium",
+  "mace_steps": 21,
+  "mace_thickness_A": 3.345,
+  "mapping": {
+    "Ni": "Ni",
+    "P": "Pd",
+    "Se": "Se"
+  },
+  "min_distance_A": 2.171,
+  "note": "Unrelaxed starting structure; needs MLIP pre-relax and a VESTA check.",
+  "nsites": 10,
+  "prototype_formula": "NiPSe3",
+  "prototype_ox": {
+    "Ni": 2,
+    "P": 4,
+    "Se": -2
+  },
+  "rank": 1,
+  "score": 0.245,
+  "source": "mc2d",
+  "spacegroup_symprec0.1": "P-31m (162)",
+  "start_thickness_A": 2.951,
+  "thickness_A": 2.951,
+  "vacuum_A": 20.0
+}

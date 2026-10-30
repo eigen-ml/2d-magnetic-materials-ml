@@ -1,0 +1,46 @@
+{
+  "anonymous": "A4B2C",
+  "candidate_ox": {
+    "Hf": 4,
+    "Ni": 2,
+    "S": -2
+  },
+  "citation": "Zhou et al., Sci. Data 6, 86 (2019)",
+  "formula": "HfNi2S4",
+  "group": "control",
+  "id": "2dm-4450",
+  "licence": "CC BY 4.0",
+  "mace_a_b_A": [
+    3.513,
+    6.788
+  ],
+  "mace_bonded_pieces": 1,
+  "mace_converged": true,
+  "mace_energy_eV_per_atom": -6.26431,
+  "mace_max_plane_gap_A": 1.153,
+  "mace_min_distance_A": 2.179,
+  "mace_model": "MACE-MP-0 medium",
+  "mace_steps": 43,
+  "mace_thickness_A": 3.264,
+  "mapping": {
+    "Fe": "Ni",
+    "Se": "S",
+    "Ti": "Hf"
+  },
+  "min_distance_A": 2.169,
+  "note": "Unrelaxed starting structure; needs MLIP pre-relax and a VESTA check.",
+  "nsites": 7,
+  "prototype_formula": "Fe2Se4Ti",
+  "prototype_ox": {
+    "Fe": 2,
+    "Se": -2,
+    "Ti": 4
+  },
+  "rank": 2,
+  "score": 0.31485264079369724,
+  "source": "twodmatpedia",
+  "spacegroup_symprec0.1": "P-1 (2)",
+  "start_thickness_A": 3.124,
+  "thickness_A": 3.124,
+  "vacuum_A": 20.0
+}

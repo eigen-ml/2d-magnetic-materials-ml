@@ -1,0 +1,46 @@
+{
+  "anonymous": "A3BC",
+  "candidate_ox": {
+    "Ni": 2,
+    "Pd": 4,
+    "Se": -2
+  },
+  "citation": "Zhou et al., Sci. Data 6, 86 (2019)",
+  "formula": "NiPdSe3",
+  "group": "control",
+  "id": "2dm-4462",
+  "licence": "CC BY 4.0",
+  "mace_a_b_A": [
+    3.625,
+    6.06
+  ],
+  "mace_bonded_pieces": 1,
+  "mace_converged": true,
+  "mace_energy_eV_per_atom": -4.50395,
+  "mace_max_plane_gap_A": 1.472,
+  "mace_min_distance_A": 2.264,
+  "mace_model": "MACE-MP-0 medium",
+  "mace_steps": 34,
+  "mace_thickness_A": 2.944,
+  "mapping": {
+    "Ca": "Ni",
+    "S": "Se",
+    "Sn": "Pd"
+  },
+  "min_distance_A": 2.139,
+  "note": "Unrelaxed starting structure; needs MLIP pre-relax and a VESTA check.",
+  "nsites": 5,
+  "prototype_formula": "CaS3Sn",
+  "prototype_ox": {
+    "Ca": 2,
+    "S": -2,
+    "Sn": 4
+  },
+  "rank": 2,
+  "score": 0.44464421152100664,
+  "source": "twodmatpedia",
+  "spacegroup_symprec0.1": "Pmmm (47)",
+  "start_thickness_A": 2.139,
+  "thickness_A": 2.139,
+  "vacuum_A": 20.0
+}

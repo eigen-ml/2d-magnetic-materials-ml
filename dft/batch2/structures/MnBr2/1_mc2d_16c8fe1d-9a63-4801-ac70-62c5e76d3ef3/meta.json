@@ -1,0 +1,43 @@
+{
+  "anonymous": "A2B",
+  "candidate_ox": {
+    "Br": -1,
+    "Mn": 2
+  },
+  "citation": "Campi et al., ACS Nano 17, 11268 (2023); Mounet et al., Nat. Nanotechnol. 13, 246 (2018)",
+  "formula": "MnBr2",
+  "group": "control",
+  "id": "16c8fe1d-9a63-4801-ac70-62c5e76d3ef3",
+  "licence": "CC BY 4.0",
+  "mace_a_b_A": [
+    3.893,
+    3.893
+  ],
+  "mace_bonded_pieces": 1,
+  "mace_converged": true,
+  "mace_energy_eV_per_atom": -4.93888,
+  "mace_max_plane_gap_A": 1.512,
+  "mace_min_distance_A": 2.709,
+  "mace_model": "MACE-MP-0 medium",
+  "mace_steps": 5,
+  "mace_thickness_A": 3.023,
+  "mapping": {
+    "Br": "Br",
+    "Mn": "Mn"
+  },
+  "min_distance_A": 2.49,
+  "note": "Unrelaxed starting structure; needs MLIP pre-relax and a VESTA check.",
+  "nsites": 3,
+  "prototype_formula": "Br2Mn",
+  "prototype_ox": {
+    "Br": -1,
+    "Mn": 2
+  },
+  "rank": 1,
+  "score": 0.0,
+  "source": "mc2d",
+  "spacegroup_symprec0.1": "P-3m1 (164)",
+  "start_thickness_A": 2.757,
+  "thickness_A": 2.757,
+  "vacuum_A": 20.0
+}

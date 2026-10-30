@@ -1,4 +1,4 @@
-"""Stage P: starting structures for DFT batch 1.
+"""Stage P: starting structures for a DFT batch and its control group.
 
 For each candidate, 2D structures with the same anonymous formula are taken from MC2D and
 2DMatPedia (OPTIMADE). Elements are put on the prototype sites by count, sign of the
@@ -259,10 +259,19 @@ def main() -> None:
     parser.add_argument("--keep", type=int, default=3, help="prototypes written per candidate")
     parser.add_argument("--max-orderings", type=int, default=8, help="anion orderings written per mixed-anion candidate")
     parser.add_argument("--min-distance", type=float, default=1.6, help="drop structures with closer atoms (A)")
+    parser.add_argument("--groups", default="main,reference,control", help="selection groups to build, comma-separated")
     args = parser.parse_args()
 
+    args.out = args.out.resolve()
     selection = json.loads(args.selection.read_text(encoding="utf-8"))
-    formulas = [(f, "main") for f in selection["main"]] + [(f, "reference") for f in selection["reference"]]
+    control = selection.get("control", {})
+    groups = {
+        "main": selection.get("main", []),
+        "reference": selection.get("reference", []),
+        # control compositions are substituted onto prototypes like the main batch
+        "control": control.get("picked", []) + control.get("fixed", []),
+    }
+    formulas = [(f, g) for g in args.groups.split(",") for f in groups[g]]
     client = filters.CachedClient(args.cache)
     rows = []
     for formula, group in formulas:

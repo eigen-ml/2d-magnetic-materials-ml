@@ -1,0 +1,46 @@
+{
+  "anonymous": "A4B2C",
+  "candidate_ox": {
+    "Ni": 2,
+    "Te": -2,
+    "Zr": 4
+  },
+  "citation": "Campi et al., ACS Nano 17, 11268 (2023); Mounet et al., Nat. Nanotechnol. 13, 246 (2018)",
+  "formula": "ZrNi2Te4",
+  "group": "control",
+  "id": "87d1b8a6-1b35-414b-bd75-63d264d27d62",
+  "licence": "CC BY 4.0",
+  "mace_a_b_A": [
+    3.601,
+    7.045
+  ],
+  "mace_bonded_pieces": 1,
+  "mace_converged": true,
+  "mace_energy_eV_per_atom": -5.11123,
+  "mace_max_plane_gap_A": 0.863,
+  "mace_min_distance_A": 2.536,
+  "mace_model": "MACE-MP-0 medium",
+  "mace_steps": 7,
+  "mace_thickness_A": 3.914,
+  "mapping": {
+    "Te": "Te",
+    "Ti": "Zr",
+    "V": "Ni"
+  },
+  "min_distance_A": 2.635,
+  "note": "Unrelaxed starting structure; needs MLIP pre-relax and a VESTA check.",
+  "nsites": 7,
+  "prototype_formula": "Te4TiV2",
+  "prototype_ox": {
+    "Te": -2,
+    "Ti": 4,
+    "V": 2
+  },
+  "rank": 1,
+  "score": 0.26188929782781273,
+  "source": "mc2d",
+  "spacegroup_symprec0.1": "C2/m (12)",
+  "start_thickness_A": 3.669,
+  "thickness_A": 3.669,
+  "vacuum_A": 20.0
+}

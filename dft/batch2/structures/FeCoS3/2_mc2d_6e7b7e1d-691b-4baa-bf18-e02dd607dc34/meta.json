@@ -1,0 +1,46 @@
+{
+  "anonymous": "A3BC",
+  "candidate_ox": {
+    "Co": 3,
+    "Fe": 3,
+    "S": -2
+  },
+  "citation": "Campi et al., ACS Nano 17, 11268 (2023); Mounet et al., Nat. Nanotechnol. 13, 246 (2018)",
+  "formula": "FeCoS3",
+  "group": "main",
+  "id": "6e7b7e1d-691b-4baa-bf18-e02dd607dc34",
+  "licence": "CC BY 4.0",
+  "mace_a_b_A": [
+    5.74,
+    5.74
+  ],
+  "mace_bonded_pieces": 1,
+  "mace_converged": true,
+  "mace_energy_eV_per_atom": -5.74718,
+  "mace_max_plane_gap_A": 1.145,
+  "mace_min_distance_A": 2.081,
+  "mace_model": "MACE-MP-0 medium",
+  "mace_steps": 14,
+  "mace_thickness_A": 2.795,
+  "mapping": {
+    "Fe": "Fe",
+    "P": "Co",
+    "S": "S"
+  },
+  "min_distance_A": 2.182,
+  "note": "Unrelaxed starting structure; needs MLIP pre-relax and a VESTA check.",
+  "nsites": 10,
+  "prototype_formula": "FePS3",
+  "prototype_ox": {
+    "Fe": 3,
+    "P": 3,
+    "S": -2
+  },
+  "rank": 2,
+  "score": 0.29310344827586216,
+  "source": "mc2d",
+  "spacegroup_symprec0.1": "P-31m (162)",
+  "start_thickness_A": 2.84,
+  "thickness_A": 2.84,
+  "vacuum_A": 20.0
+}
